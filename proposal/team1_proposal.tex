@@ -1,0 +1,179 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\usepackage{listings}
+\lstset{
+  frame=single,
+  language=python,
+  basicstyle=\small,
+}
+
+\makeatletter
+\def\lst@makecaption{%
+  \def\@captype{table}%
+  \@makecaption
+}
+\makeatother
+
+\begin{document}
+
+\title{CS525 - Team 1 Project 4 Proposal}
+
+\author{
+\IEEEauthorblockN{Alexander Moore}
+\IEEEauthorblockA{\textit{Data Science} \\
+\textit{Worcester Polytechnic Institute}\\
+Worcester, United States \\
+ammoore@wpi.edu}
+
+\and
+
+\IEEEauthorblockN{Brian Lewandowski}
+\IEEEauthorblockA{\textit{Computer Science} \\
+\textit{Worcester Polytechnic Institute}\\
+Worcester, United States \\
+balewandowski@wpi.edu}
+
+\and
+
+\IEEEauthorblockN{Jannik Haas}
+\IEEEauthorblockA{\textit{Data Science} \\
+\textit{Worcester Polytechnic Institute}\\
+Worcester, United States \\
+jbhaas@wpi.edu}
+
+\and
+
+\IEEEauthorblockN{Quincy Hershey}
+\IEEEauthorblockA{\textit{Data Science} \\
+\textit{Worcester Polytechnic Institute}\\
+Worcester, United States \\
+qbhershey@wpi.edu}
+
+\and
+
+\IEEEauthorblockN{Scott Tang}
+\IEEEauthorblockA{\textit{Data Science} \\
+\textit{Worcester Polytechnic Institute}\\
+Worcester, United States \\
+stang13@wpi.edu}
+}
+
+\maketitle
+
+\begin{abstract}
+    Following a baseline of techniques and best practices found in the literature this project will show a comparison of multiple reinforcement learning techniques applied in a common environment.
+    In particular, the aim of this project is to implement several Q-learning and policy learning algorithms and compare the results.
+    In addition, the results attained by this work will be compared to those already reported in established works.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Q-Learning, Policy Learning, DQN, Policy Gradient, Reinforcement Learning
+\end{IEEEkeywords}
+
+\section{Introduction}
+Project 3 explored how to construct a Deep Q Network (DQN) by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
+Building off of this recent experience this project proposes that deep learning techniques applied to the area of policy learning are implemented and compared to the results of DQNs.
+
+In addition, this project proposes to use \cite{bhonker2017playing} as a baseline for the environment and games to use for comparison of techniques as it is considered more difficult than the Atari 2600 games contained in the Arcade Learning Environment \cite{Bellemare_2013}.
+Using this environment multiple agents will be trained using policy learning techniques such as vanilla policy gradient, proximal policy optimization (PPO), and trust region policy optimization (TRPO).
+
+The results of these agents will then be compared to trained Q-learning agents implemented as a DQN, Double DQN (DDQN), and Dueling DDQN; while using the results to assess the strengths and weaknesses of each.
+
+The remainder of this proposal is as follows.
+Section II provides background information regarding the methods planned to be implemented.
+Section III outlines the specific work planned for this project.
+Section IV proposes a timeline for the completion of project milestones.
+Section VI indicates the expected deliverables to be generated and provided as part of this work.
+Finally, the proposal concludes in section VII.
+
+\section{Background Information}
+
+\section{Planned Work}
+
+\subsection{Background Research}
+Research is planned to be performed to understand all of the techniques to be exercised during this project.
+In addition, the literature will be surveyed to identify any recent developments or improvements related to the methods being employed.
+While doing this, we also plan to obtain available benchmarks for techniques such as those found in \cite{DQNOriginalPaper}, \cite{NatureDeepLearning}, and \cite{bhonker2017playing}.
+
+\subsection{Environment Setup}
+This part of the project involves ensuring that all team members have the ability to develop and assess the algorithms under study.
+Some of the key areas include ensuring a common (or compatible) software environment is available including the ability to run \cite{bhonker2017playing} either locally or on a WPI asset such as the ACE cluster.
+
+In addition, a simple framework or skeleton code should be utilized such that all algorithm implementations are structurally similar.
+We plan to take advantage of the provided framework from Project 3 to reduce the amount of work necessary in this area.
+
+\subsection{Algorithm Implementations}
+The algorithm implementations involve taking the actual theoretical algorithms and implementing them in Python code using common libraries such as PyTorch and NumPy.
+The goal of these implementations is to be true to the algorithms and any notable improvements that have become commonplace in practice..
+
+While deviations to these algorithms may become necessary for practical reasons, they will be noted in the final report provided.
+
+\subsection{Results Analysis}
+During the analysis of the results each model will be compared using common metrics such reward per episode and the number of episodes necessary for convergence.
+In addition, commentary will be provided of any interesting results or findings from the experiments that do not fit into the objective metrics being measured.
+
+\subsection{Paper Preparation}
+A roughly 10 page paper will be put together to conclude this project and communicate its findings.
+This paper will include any background information necessary for the project, a description of methodologies used, results, and an analysis of the results.
+
+\subsection{Presentation Preparation}
+The work of this project will be summarized in a presentation to be delivered on the poster day for the project.
+If any work is found to be an interesting demo it would be displayed during the presentation time.
+
+\section{Tools and Environment}
+
+\subsection{Implementation Language}
+This project will be using the Python language of at least version 3.8.
+In addition to the standard libraries, it is expected that the following additional libraries will be utilized:
+
+* PyTorch
+
+* NumPy
+
+* Matplotlib
+
+* Pandas
+
+In addition, the framework from Project 3 will be utilized as a baseline for implementing the various algorithms being researched.
+
+\subsection{Reinforcement Learning Environment}
+This project plans to use an existing reinforcement learning environment to use while assessing the various algorithm implementations.
+In particular, the Retro Learning Environment \cite{bhonker2017playing} will be utilized for its large selection of games with high levels of complexity.
+In addition, it maintains the same API as the environment used in Project 3 making it close to a drop-in replacement for the existing Project 3 framework.
+
+The initial plan is to focus on the games explored in \cite{bhonker2017playing} as there is a baseline result for several algorithms and a known level of complexity.
+Some of the options to be explored include F-Zero, Gradius 3, Mortal Kombat, and Wolfenstein.
+Note that the choice of game is subject to change depending on availability of published results and practical reasons given the time frame for the project.
+
+\subsection{Compute Resources}
+The plan for compute resources is to use a combination of local machines as well as the ACE cluster at WPI.
+Several team members have access to personal machines with GPUs while other team members have access to the ACE cluster.
+These resources combined should provide sufficient computing resources to be successful on this project.
+
+\section{Schedule}
+
+\section{Deliverables}
+
+\subsection{Report}
+
+\subsection{Code and Model Artifacts}
+
+\subsection{Presentation}
+
+\section{Conclusion}
+
+\bibliography{citations.bib}{}
+\bibliographystyle{plain}
+
+\vspace{12pt}
+
+\end{document}
