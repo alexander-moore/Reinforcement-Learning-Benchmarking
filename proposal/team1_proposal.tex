@@ -83,7 +83,7 @@ Q-Learning, Policy Learning, DQN, Policy Gradient, Reinforcement Learning
 Project 3 explored how to construct a Deep Q Network (DQN) by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
 Building off of this recent experience this project proposes that deep learning techniques applied to the area of policy learning are implemented and compared to the results of DQNs.
 
-In addition, this project proposes to use \cite{bhonker2017playing} as a baseline for the environment and games to use for comparison of techniques as it is considered more difficult than the Atari 2600 games contained in the Arcade Learning Environment \cite{Bellemare_2013}.
+In addition, this project proposes to use \cite{nichol2018retro} as a baseline for the environment and games to use for comparison of techniques as it is considered more difficult than the Atari 2600 games contained in the Arcade Learning Environment \cite{Bellemare_2013}.
 Using this environment multiple agents will be trained using policy learning techniques such as vanilla policy gradient, proximal policy optimization (PPO), and trust region policy optimization (TRPO), with the final cast of models to be determined based on compute-time.
 
 The results of these agents will then be compared to trained Q-learning agents implemented as a DQN, Double DQN (DDQN), and Dueling DDQN; while using the results to assess the strengths and weaknesses of each. By comparing multiple agents across multiple games we will create a case for the superiority or inferiority of some algorithms to others, or find that there is no one algorithm which consistently outperforms others.
@@ -112,14 +112,14 @@ While doing this, we also plan to obtain available benchmarks for techniques suc
 
 \subsection{Environment Setup}
 This part of the project involves ensuring that all team members have the ability to develop and assess the algorithms under study.
-Some of the key areas include ensuring a common (or compatible) software environment is available including the ability to run \cite{bhonker2017playing} either locally or on a WPI asset such as the Ace cluster.
+Some of the key areas include ensuring a common (or compatible) software environment is available including the ability to run \cite{nichol2018retro} either locally or on a WPI asset such as the Ace cluster.
 
 In addition, a simple framework or skeleton code should be utilized such that all algorithm implementations are structurally similar.
 We plan to take advantage of the provided framework from Project 3 to reduce the amount of work necessary in this area.
 
 \subsection{Algorithm Implementations}
 The algorithm implementations involve taking the actual theoretical algorithms and implementing them in Python code using common libraries such as PyTorch and NumPy.
-The goal of these implementations is to be true to the algorithms and any notable improvements that have become commonplace in practice..
+The goal of these implementations is to be true to the algorithms and any notable improvements that have become commonplace in practice.
 
 While deviations to these algorithms may become necessary for practical reasons, they will be noted in the final report provided.
 
@@ -134,34 +134,32 @@ This paper will include any background information necessary for the project, a 
 \subsection{Presentation Preparation}
 The work of this project will be summarized in a presentation to be delivered on the poster day for the project.
 If any work is found to be an interesting demo it would be displayed during the presentation time. Presentation will include findings on:
-\begin{enumerate}
-- expected score in testing after a fixed training time in seconds or iterations for each game
-- necessary training time in seconds or iterations to achieve a fixed score for each game
-- comparison of learning rates of models for each game
-- Meta-comparison of games, their action spaces, and relevant challenges and tasks
-\end{enumerate}
+\begin{itemize}
+    \item expected score in testing after a fixed training time in seconds or iterations for each game
+    \item necessary training time in seconds or iterations to achieve a fixed score for each game
+    \item comparison of learning rates of models for each game
+    \item Meta-comparison of games, their action spaces, and relevant challenges and tasks
+\end{itemize}
 
 \section{Tools and Environment}
 
 \subsection{Implementation Language}
-This project will be using the Python language of at least version 3.8.
+This project will be using the Python language of at least version 3.7.
 In addition to the standard libraries, it is expected that the following additional libraries will be utilized:
-
-* Environments: \cite{bhonker2017playing}
-
-* PyTorch
-
-* NumPy
-
-* Matplotlib
-
-* Pandas
+ 
+\begin{itemize}
+    \item Gym Retro \cite{nichol2018retro}
+    \item PyTorch
+    \item NumPy
+    \item Matplotlib
+    \item Pandas
+\end{itemize}
 
 In addition, the framework from Project 3 will be utilized as a baseline for implementing the various algorithms being researched. Each algorithm can be fit in this framework to facilitate plug-and-train pipelines for each different model and game.
 
 \subsection{Reinforcement Learning Environment}
-This project plans to use an existing reinforcement learning environment to use while assessing the various algorithm implementations.
-In particular, the Retro Learning Environment \cite{bhonker2017playing} will be utilized for its large selection of games with high levels of complexity.
+This project plans to use an existing reinforcement learning environment while assessing the various algorithm implementations.
+In particular, the Retro Learning Environment \cite{nichol2018retro} will be utilized for its large selection of games with high levels of complexity.
 In addition, it maintains the same API as the environment used in Project 3 making it close to a drop-in replacement for the existing Project 3 framework.
 
 The initial plan is to focus on the games explored in \cite{bhonker2017playing} as there is a baseline result for several algorithms and a known level of complexity.
@@ -173,25 +171,76 @@ These games represent diversity in action spaces, reward sparsity, action-memory
 The plan for compute resources is to use a combination of local machines as well as the Ace cluster at WPI.
 Several team members have access to personal machines with GPUs while other team members have access to the Ace cluster.
 These resources combined should provide sufficient computing resources to be successful on this project.
-Dispatching batches of jobs to the Turing machine with GPU requirements can also expeditite long training times.
+Dispatching batches of jobs to the Turing machine with GPU requirements can also expedite long training times.
 
 \section{Schedule}
+This section outlines the schedule for this project on a weekly basis with the main tasks enumerated within the week during which they are expected to complete.
+It should be noted that this is a tentative schedule to serve as a guideline and some items may be adjusted as needed through the course of the project.
+
+\subsection{Week Ending 11/13}
 \begin{enumerate}
-- November 12: Project Proposal
-- November 19: Project Progress Report
+    \item Refine Project Idea
+    \item Develop Project Proposal
+    \item Submit Project Proposal
+\end{enumerate}
+
+\subsection{Week Ending 11/20}
+\begin{enumerate}
+    \item Set up environment infrastructure
+    \item Research and understand algorithms
+    \item Begin implementing algorithms
+\end{enumerate}
+
+\subsection{Week Ending 11/27}
+\begin{enumerate}
+    \item Continue algorithm implementation
+    \item Begin algorithm execution
+    \item Refine model hyperparameters as needed
+    \item Collect data for analysis
+    \item Prepare and deliver project progress report
+\end{enumerate}
+
+\subsection{Week Ending 12/04}
+\begin{enumerate}
+    \item Analyze and compare model performance
+    \item Begin writing report
+    \item Begin working on presentation
+\end{enumerate}
+
+\subsection{Week Ending 12/11}
+\begin{enumerate}
+    \item Complete report
+    \item Complete presentation
+    \item Dry run presenation
+    \item Submit artifacts
+    \item Present findings during poster session
 \end{enumerate}
 
 \section{Deliverables}
-Our deliverables will include a presentation on our findings, $N*K$ trained models where N is our number of agents and K is our number of games, and a general workflow others can use to do the same.
 
-\subsection{Report}
+\subsection{Progress Report}
+A progress report is planned to be put together and delivered by 11/26 in accordance with the project requirements.
+This report is expected to provide a clear picture of progress made on the project to date and the plan for the project over the remainder of the semester.
+In addition, any deviations from this proposal will be indicated as necessary in the progress report.
+
+\subsection{Final Report}
+The final report provided as part of this project will include the necessary background information required to understand the methods used.
+In addition, our findings on $N*K$ trained models where N is our number of agents and K is our number of games will be included.
+The analysis of our findings will include theory on why some models performed better or worse given the game tasks, appropriate model choices for different tasks, and a discussion on our findings of what succeeded and failed for developing diverse models over diverse tasks.
+In addition, a description of our methodology will be provided such that others could use our workflow to do the same experiments.
 
 \subsection{Code and Model Artifacts}
+All code and artifacts needed to duplicate this project will be provided as part of the deliverables for this project.
+In addition, all models used in reported performance measures will be provided.
 
 \subsection{Presentation}
+The presentation delivered as part of this project will provide an overview of the information covered in the final report.
+This includes brief background information and a focus on the comparative results received.
+If applicable, any live demos will be performed during this portion of the project.
 
 \section{Conclusion}
-Our conclusions will include theory on why some models performed better or worse given the game tasks, appropriate model choices for different tasks, and a discussion on our findings of what succeeded and failed for developing diverse models over diverse tasks.
+This proposal has provided a detailed summary of the planned project including its overall objectives, an outline of the methodology proposed, as well as a detailed schedule.
+We welcome any feedback and look forward to exploring this area of reinforcement learning over the next few weeks.
 
 \bibliography{citations.bib}{}
 \bibliographystyle{plain}
