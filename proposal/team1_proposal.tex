@@ -96,12 +96,15 @@ Section VI indicates the expected deliverables to be generated and provided as p
 Finally, the proposal concludes in section VII.
 
 \section{Background Information}
-
+Our goals may change for implementation. For example, we may focus on a smaller amount of models and instead compare tweaks on these algorithms to demonstrate and quantify the improvement they offer.
 \subsection{Deep Q Learning}
+Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For some of our environments this will be a convolution over a screen space, and for some we might extract some derived features about the game for the model to use as a state representation.
 
 \subsection{Double Deep Q Learning}
+Double deep Q networks address the maximization bias problem from Deep q learning by instead letting two Q functions randomly select the action and update the corresponding Q function. This process inhibits bias and might outperform DQN on some or all tasks.
 
 \subsection{Dueling Deep Q Learning}
+Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states. For this reason this different approach will be interseting to analyze on tasks where the actions might not always directly affect the environment.
 
 \section{Planned Work}
 
