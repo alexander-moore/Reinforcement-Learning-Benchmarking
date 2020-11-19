@@ -42,7 +42,16 @@ class Agent_DQN(Agent):
         print(self.device)
         # catch model args
         
-        self.game_dim = env.reset().shape
+        self.batch_size = batch_size_arg_here
+        
+        sample_state = env.reset()
+        self.game_dim = sample_state.shape
+        self.state_dim = sample_state.unsqueeze(0).shape
+        self.batch_dim = torch.cat(self.batch_size*[sample_state.unsqueeze(0)]).shape
+        
+        print(self.game_dim)
+        print(self.state_dim)
+        print(self.batch_dim)
         
         self.model = model(self.model_args)
         self.replay_buffer = deque(maxlen = 10000)
