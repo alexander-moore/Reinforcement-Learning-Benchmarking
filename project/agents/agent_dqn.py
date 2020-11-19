@@ -54,7 +54,7 @@ class Agent_DQN(Agent):
         print(self.batch_dim)
         
         self.model = model(self.model_args)
-        self.replay_buffer = deque(maxlen = 10000)
+        self.replay_buffer = agents.replay_buffer.ReplayBuffer()
 
         # Construct your optimizer here
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
@@ -153,8 +153,7 @@ class Agent_DQN(Agent):
                 
                 if len(self.replay_buffer) > self.learning_start:
                     self.optimizer.zero_grad()
-                    batch = random.sample(self.replay_buffer, self.batch_size)
-                    states, actions, next_states, rewards, terminals = zip(*minibatch)
+                    states, actions, next_states, rewards, terminals = self.replay_buffer.get_mini_batch()
                     
                     q_input = torch.stack(next_states, axis = 0).reshape(self.batch_size, self.game_size)
                     yj = torch.Tensor(rewards, device = self.device) + self.gamma * torch.max(self.Qtarget(q_input), dim=1)[0]
