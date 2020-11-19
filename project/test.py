@@ -23,19 +23,25 @@ def parse():
     return args
 
 
-def test(agent, env, total_episodes=30):
+def test(agent, env, total_episodes=30, render_test=False):
     rewards = []
     env.seed(seed)
     for i in range(total_episodes):
         state = env.reset()
+
+        if render_test:
+            env.env.render()
+
         agent.init_game_setting()
         done = False
         episode_reward = 0.0
 
         #playing one game
         while(not done):
-            action = agent.make_action(state, test=True)
+            action = agent.make_action(state, 0, test=True)
             state, reward, done, info = env.step(action)
+            if render_test:
+                env.env.render()
             episode_reward += reward
 
         rewards.append(episode_reward)
