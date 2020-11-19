@@ -23,7 +23,6 @@ def add_arguments(parser):
     parser.add_argument('--render_train', action='store_true', help='Indicates to show GUI rendering of training episodes being played.')
     parser.add_argument('--render_test', action='store_true', help='Indicates to show GUI rendering of test episodes being played.')
     parser.add_argument('--target_network_update_interval', type=int, default=5000, help='Number of steps that occur until the target network is updated.')
-    parser.add_argument('--model_prefix', type=str, default='', help='If present, then this prefix is added to the default model name.')
     parser.add_argument('--archive_dir', type=str, default='archive', help='Indicates where to store data collections.')
     parser.add_argument('--run_name', type=str, required=True, help='Provide a name for this execution for archive collection name.')
     parser.add_argument('--test_cycle_interval', type=int, default=1000, help='Perform a test cycle in intervals of this value.')
