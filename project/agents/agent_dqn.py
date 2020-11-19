@@ -38,9 +38,20 @@ class Agent_DQN(Agent):
         super(Agent_DQN,self).__init__(env, args, model, device)
         ###########################
         # YOUR IMPLEMENTATION HERE #
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print(self.device)
+        # catch model args
+        
+        self.game_dim = env.reset().shape
+        
+        self.model = model(self.model_args)
+        self.replay_buffer = deque(maxlen = 10000)
 
         # Construct your optimizer here
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        
+        # model-specific arguments
+        self.target_update_interval = 5000
 
     def init_game_setting(self):
         """
@@ -54,12 +65,11 @@ class Agent_DQN(Agent):
         ###########################
         pass
     
-    
     def make_action(self, observation, epsilon, test=True):
         """
         Return predicted action of your agent
         Input:
-            observation: np.array
+            observation: np.array [preprocessed before input]
                 stack 4 last preprocessed frames, shape: (84, 84, 4)
         Return:
             action: int
@@ -67,11 +77,15 @@ class Agent_DQN(Agent):
         """
         ###########################
         # YOUR IMPLEMENTATION HERE #
-
-        action = 0
-        
+        # with torch.no_grad(): ?
+        if test:
+            action = torch.argmax(self.Q(observation))
+            
+        else:
+            if self.epsilon >= torch.rand(1):
+                action = torch.randint(self.num_actions)
         ###########################
-        return action
+        return int(action)
     
     def push(self, replay_entry=None):
         """ You can add additional arguments as you need. 
@@ -109,6 +123,40 @@ class Agent_DQN(Agent):
         """
         ###########################
         # YOUR IMPLEMENTATION HERE #
+        
+        if not self.can_train():
+            RaiseError('Can\'t train: self.can_train == False')
+            
+        for i in range(self.n_iterations):
+            state = self.env.reset()
+            state_processed = torch.Tensor((state/255).reshape(1, self.game_size), device = self.device)
+            
+            terminal = False
+            while not terminal:
+                action = self.make_action(state_processed, test = False)
+                new_state, reward, terminal, _ = self.env.step(action)
+                new_state_processed = torch.Tensor((new_state/255).reshape(game_size), device = self.device) # can use .unsqueeze(0) to add go (x) -> (1,x)
+                
+                self.replay_buffer.append([state_processed, action, new_state_processed, reward, terminal])
+                state_processed = new_state_processed
+                
+                # pop deque here? or does it self-pop
+                
+                if len(self.replay_buffer) > self.learning_start:
+                    self.optimizer.zero_grad()
+                    batch = random.sample(self.replay_buffer, self.batch_size)
+                    states, actions, next_states, rewards, terminals = zip(*minibatch)
+                    
+                    q_input = torch.stack(next_states, axis = 0).reshape(self.batch_size, self.game_size)
+                    yj = torch.Tensor(rewards, device = self.device) + self.gamma * torch.max(self.Qtarget(q_input), dim=1)[0]
+                    
+                    yj[terminals == True] = rewards[terminals == True] # special case of terminals, overwritten
+                    
+                    states = torch.stack(states, axis = 0).reshape(self.batch_size, self.game_size)
+                    Q_out = self.Q(states)
+                    
+                    #...
+                
 
         return 0
         
