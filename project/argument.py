@@ -9,7 +9,6 @@ def add_arguments(parser):
     '''
     parser.add_argument('--model', type=str, required=True, help='The model to exercise:\ndqn_model.DQN')
     parser.add_argument('--agent', type=str, required=True, help='The agent to exercise:\nagent_dqn.Agent_DQN')
-    parser.add_argument('--batch_size', type=int, default=32, help='batch size for training')
     parser.add_argument('--lr', type=float, default=1.5e-4, help='Learning rate for training')
     parser.add_argument('--replay_buffer_size', type=int, default=10000, help='Size of the replay buffer')
     parser.add_argument('--replay_buffer_batch_size', type=int, default=32, help='Size of the mini-batch samples pulled from replay buffer')

@@ -7,17 +7,22 @@ DO NOT revise this file
 import sys
 from environment import Environment
 import torch
+from agents.replay_buffer import ReplayBuffer
 
 class Agent(object):
     def __init__(self, env, args, model_class, device):
         self.env = env
         self.lr = args.lr
         self.gamma = args.gamma
-        self.batch_size = args.batch_size
+        self.replay_buffer_size = args.replay_buffer_size
+        self.replay_buffer_batch_size = args.replay_buffer_batch_size
+        self.min_buffer_size = args.min_buffer_size
         self.device = device
         self.target_update_steps = args.target_network_update_interval
         self.model_class = model_class
         self.model = model_class().to(device)
+
+        self.buffer = ReplayBuffer(self.replay_buffer_size, self.replay_buffer_batch_size)
 
     def make_action(self, observation, epsilon, test=True):
         """

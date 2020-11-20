@@ -12,7 +12,7 @@ import torch.optim as optim
 
 from agent import Agent
 from dqn_model import DQN
-import agents.replay_buffer
+from .replay_buffer import ReplayBuffer
 
 """
 you can import any package and define any extra function as you need

@@ -294,4 +294,3 @@ class AgentRunner():
 
     def test(self):
         test(self.agent, self.env, total_episodes=100, render_test=self.render_test)
-
