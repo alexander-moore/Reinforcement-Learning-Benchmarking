@@ -12,6 +12,7 @@ Hopefully this allows us to just implement model/agent specific things and not h
 
 ### Implement __init__
 * Create your optimizer and assign to self.optimizer
+* Create your loss function and assign to self.criterion
 * Perform any other agent specific items needed
     * EX:  In DQN you would create your target model as seen in sample\_agent.py here
 
@@ -33,10 +34,13 @@ Hopefully this allows us to just implement model/agent specific things and not h
 ### Implement train
 * This is called at each step of the training loop if can\_train is True
 
-* Pseudocode from agent\_runner.py 
-* for episode:
-*     for step:
-*        train() <--- This method
+* Pseudocode from agent\_runner.py:
+
+```
+for episode:
+    for step:
+       train() <--- This method
+```
 
 * The current tuple for the step is provided and any training should be performed here
 * This is where you calculate loss and perform gradient descent
