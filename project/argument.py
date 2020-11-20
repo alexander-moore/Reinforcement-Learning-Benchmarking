@@ -28,5 +28,6 @@ def add_arguments(parser):
     parser.add_argument('--test_cycle_interval', type=int, default=1000, help='Perform a test cycle in intervals of this value.')
     parser.add_argument('--model_path', type=str, default=None, help='Path to model weights to load.')
     parser.add_argument('--optimizer_path', type=str, default=None, help='Path to optimizer weights to load.')
+    parser.add_argument('--list', action='store_true', help='Lists out all of the available models and agents.')
 
     return parser

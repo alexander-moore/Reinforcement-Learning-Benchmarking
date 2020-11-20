@@ -1,9 +1,12 @@
 import argparse
 from test import test
 from environment import Environment
+import glob
 import agent_runner
 import sys
 import importlib
+import os
+import re
 
 def parse():
     parser = argparse.ArgumentParser(description="DS595/CS525 RL Project 3")
@@ -18,6 +21,54 @@ def parse():
     args = parser.parse_args()
     return args
 
+def list_agents_and_models():
+    # Get all files in agents directory
+    agent_files = glob.glob('./agents/*.py')
+
+    print('')
+    print('    Agents Available:')
+
+    # Get all classes in those files
+    for af in agent_files:
+        if '__init__' in af or 'replay_buffer' in af:
+            continue
+        
+        # Get module name from file name
+        _, file_name = os.path.split(af)
+        file_name = file_name.replace('.py', '')
+
+        # Get agent classes from file
+        with open(af, 'r') as f:
+            lines = f.readlines()
+        for line in lines:
+            if re.match(r'^class', line):
+                agent_class_name = (re.findall(r'^class\s+(\w+)\(.*', line))[0]
+                print(f'        - {file_name}.{agent_class_name}')
+
+
+    # Get all files in models directory
+    model_files = glob.glob('./models/*.py')
+
+    print('')
+    print('    Models Available:')
+
+    # Get all classes in those files
+    for mf in model_files:
+        if '__init__' in mf:
+            continue
+        
+        # Get module name from file name
+        _, file_name = os.path.split(mf)
+        file_name = file_name.replace('.py', '')
+
+        # Get agent classes from file
+        with open(mf, 'r') as f:
+            lines = f.readlines()
+        for line in lines:
+            if re.match(r'^class', line):
+                model_class_name = (re.findall(r'^class\s+(\w+)\(.*', line))[0]
+                print(f'        - {file_name}.{model_class_name}')
+    print('')
 
 def run(args):
     # Parse the model and environment args
@@ -56,5 +107,11 @@ def run(args):
         runner.test()
 
 if __name__ == '__main__':
+    # Hackity hack hack
+    if len(sys.argv) == 2:
+        if sys.argv[1] == '--list':
+            list_agents_and_models()
+            sys.exit()
+
     args = parse()
     run(args)
