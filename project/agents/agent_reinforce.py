@@ -133,6 +133,9 @@ class SampleAgent(Agent):
         # Update parameters
         self.optimizer.step()
 
+        # Clear buffer
+        self.buffer.clear()
+
         # Return loss
         return loss.detach().item()
 
@@ -141,3 +144,4 @@ class SampleAgent(Agent):
             torch.from_numpy(np.array([state]).transpose(0, 3, 1, 2)).float().to(self.device))
         log_prob = torch.log(policy.squeeze(0)[action])
         return log_prob
+

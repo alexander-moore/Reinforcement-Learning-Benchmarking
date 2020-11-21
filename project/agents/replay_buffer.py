@@ -33,3 +33,10 @@ class ReplayBuffer():
 
     def len(self):
         return len(self.replay_buffer_states)
+
+    def clear(self):
+        self.replay_buffer_states.clear()
+        self.replay_buffer_actions.clear()
+        self.replay_buffer_rewards.clear()
+        self.replay_buffer_next_states.clear()
+        self.replay_buffer_dones.clear()
