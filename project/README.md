@@ -5,6 +5,19 @@ To implement a new agent and/or model one should just need to create a new file 
 Most things like a general training loop and collecting statistics during training are taken care of by agent\_runner.py or agent.py.
 Hopefully this allows us to just implement model/agent specific things and not have to worry about the infrastructure.
 
+## Project Goals
+- Benchmark numerous agent types across discrete and continuous games
+- Models considered:
+-- DQN Models:
+- "Vanilla" DQN
+- Dueling DQN
+- Dueling Double DQN
+
+-- Policy Gradient Models:
+- MC (REINFORCE)
+- PPO
+- "Vanilla"
+
 ## Implementing a new agent
 
 ### Copy agents/sample\_agent.py to a new file
