@@ -18,6 +18,10 @@ Hopefully this allows us to just implement model/agent specific things and not h
 - PPO
 - "Vanilla"
 
+Tasks:
+- https://gym.openai.com/envs/BipedalWalker-v2/
+- https://gym.openai.com/envs/Breakout-v0/
+
 ## Implementing a new agent
 
 ### Copy agents/sample\_agent.py to a new file
