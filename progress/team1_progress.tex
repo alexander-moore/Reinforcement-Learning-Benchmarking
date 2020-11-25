@@ -93,13 +93,13 @@ The results of these agents will then be compared to trained Q-learning agents i
 
 The remainder of this progress report is as follows:
 \begin{itemize}
-\item Section II provides background information regarding the methods planned to be implemented.
-\item Section III outlines the specific work done and remaining to be done for this project.
-\item Section VI indicates the expected deliverables to be generated and provided as part of this work.
-\item Finally, the proposal concludes in section VII.
+\item Section \ref{background} provides background information regarding the methods planned to be implemented.
+\item Section \ref{planned} outlines the specific work done and remaining to be done for this project.
+\item Section \ref{deliverables} indicates the expected deliverables to be generated and provided as part of this work.
+\item Finally, the proposal concludes in section \ref{conclusion}.
 \end{itemize}
 
-\section{Background Information}
+\section{Background Information} \label{background}
 Our goals may change for implementation. For example, we may focus on a smaller amount of models and instead compare tweaks on these algorithms to demonstrate and quantify the improvement they offer.
 \subsection{Deep Q Learning}
 Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For some of our environments this will be a convolution over a screen space, and for some we might extract some derived features about the game for the model to use as a state representation.
@@ -110,7 +110,7 @@ Double deep Q networks address the maximization bias problem from Deep q learnin
 \subsection{Dueling Deep Q Learning}
 Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states by accounting for a learned state-value function $V(s)$, as well as an advantage function $A(s,a)$ interpreted as the value of taking action $a$ while in satte $s$. For this reason this different approach will be interseting to analyze on tasks where the actions might not always directly affect the environment, for example in breakout where many movements have no direct affect on the game environment.
 
-\section{Planned Work}
+\section{Planned Work} \label{planned}
 
 \subsection{Background Research}
 Research is planned to be performed to understand all of the techniques to be exercised during this project.
@@ -133,6 +133,11 @@ While deviations and modifications to these algorithms may become necessary for 
 During the analysis of the results each model will be compared using common metrics such reward per episode and the number of episodes necessary for convergence.
 In addition, commentary will be provided of any interesting results or findings from the experiments that do not fit into the objective metrics being measured.
 We will incorporate our knowledge from researching capabilities of the models as well as our intuitions gained from implementing the algorithms to analyze their performances in both testing and training. After considering case-by-case performances of each model, we can consider the field of agents to determine if there is a subset of 'best' models which consistently outperformed their peers, and maintained that success even across diverse tasks.
+
+\subsection{Work Completed}
+
+Our largest contribution to the final deliverable so far is the developement of an agent-game pair running file, in which the researcher inputs arguments into the terminal corresponding to the model and task they would like to dispatch for training. This means all of our model implementations must be written such that they are indifferent to different environment types, state shapes, model attributes, or other quirks arising in agent training. This means that all agents must inherit from a superclass of a general agent framework, and particularities in training (such as the difference between training on state-action-reward tuples, episodes, or tuples of episodes must be addressed in one exectution of the model's unique `train()` function, which is called in the general `agent_runner` executed file.
+At the testing time determined by the `agent_runner` call, this same process occurs though in a simpler fashion where the generic `agent.make_action` refers to a trained policy and state-value function to play the game it was trained on.
 
 \subsection{Paper Preparation}
 A roughly 10 page paper will be put together to conclude this project and communicate its findings.
@@ -180,9 +185,8 @@ Several team members have access to personal machines with GPUs while other team
 These resources combined should provide sufficient computing resources to be successful on this project.
 Dispatching batches of jobs to the Turing machine with GPU requirements can also expedite and parallelize long training times.
 
-\section{Work Completed and Ongoing Schedule}
-Our largest contribution to the final deliverable so far is the developement of an agent-game pair running file, in which the researcher inputs arguments into the terminal corresponding to the model and task they would like to dispatch for training. This means all of our model implementations must be written such that they are indifferent to different environment types, state shapes, model attributes, or other quirks arising in agent training. This means that all agents must inherit from a superclass of a general agent framework, and particularities in training (such as the difference between training on state-action-reward tuples, episodes, or tuples of episodes must be addressed in one exectution of the model's unique `train()` function, which is called in the general `agent_runner` executed file.
-At the testing time determined by the `agent_runner` call, this same process occurs though in a simpler fashion where the generic `agent.make_action` refers to a trained policy and state-value function to play the game it was trained on.
+\section{Work Completed and Ongoing Schedule} \label{deliverables}
+
 
 This section outlines the schedule for this project on a weekly basis with the main tasks enumerated within the week during which they are expected to complete.
 It should be noted that this is a tentative schedule to serve as a guideline and some items may be adjusted as needed through the course of the project.
@@ -248,7 +252,7 @@ The presentation delivered as part of this project will provide an overview of t
 This includes brief background information and a focus on the comparative results received.
 If applicable, any live demos will be rendered and performed during this portion of the project.
 
-\section{Conclusion}
+\section{Conclusion} \label{conclusion}
 This proposal has provided a detailed summary of the planned project including its overall objectives, an outline of the methodology proposed, as well as a detailed schedule.
 We welcome any feedback and look forward to exploring this area of reinforcement learning over the next few weeks.
 
