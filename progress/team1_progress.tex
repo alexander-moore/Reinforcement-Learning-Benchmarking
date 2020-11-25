@@ -172,10 +172,12 @@ In addition, the framework from Project 3 will be utilized as a baseline for imp
 \subsection{Reinforcement Learning Environment}
 This project plans to use an existing reinforcement learning environment while assessing the various algorithm implementations.
 In particular, the Retro Learning Environment \cite{nichol2018retro} will be utilized for its large selection of games with high levels of complexity.
+We maintain the usage of the Atari Breakout gym environement for multiple reasons. The breakout environment will be familiar to our peers as something they worked extensively with on project 3, and know the implementation tricks as well as the expected rewards of a DQN model, for example. This will contextualize a results plot which shows perhaps that DQN is outperformed by other models, to some comprehensible scale.
 In addition, it maintains the same API as the environment used in Project 3 making it close to a drop-in replacement for the existing Project 3 framework with our mentioned extensions to add robustness to model differences, game flexibility, and other algorithm needs.
 
-The initial plan is to focus on the games explored in \cite{bhonker2017playing} as there is a baseline result for several algorithms and a known level of complexity.
+The initial plan was to focus on the games explored in \cite{bhonker2017playing} as there is a baseline result for several algorithms and a known level of complexity.
 Some of the options to be explored include F-Zero, Gradius 3, Mortal Kombat, and Wolfenstein.
+We have altered this course to instead use a simple by continuous-space environment provided by the OpenAI Gym. This will lead to stability in comparing the tasks, as the environments are provided by the same source despite the games being very different. In addition a simpler task might lead to more reasonable results, where we know even DQN can have some small success, where we worried that extremely complex games might lead to uninteresting results if some models fail to learn any meaningful parameters during training.
 Note that the choice of game is subject to change depending on availability of published results and practical reasons given the time frame for the project.
 These games represent diversity in action spaces, reward sparsity, action-memory importance, and state dimensionality.
 
