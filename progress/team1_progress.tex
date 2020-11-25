@@ -25,7 +25,7 @@
 
 \begin{document}
 
-\title{CS525 - Team 1 Project 4 Proposal}
+\title{CS525 - Team 1 Project 4 Progress Report}
 
 \author{
 \IEEEauthorblockN{Alexander Moore}
@@ -73,7 +73,9 @@ stang3@wpi.edu}
     Understanding which models succeed at which tasks and why is a foundational experience in reinforcement learning.
     Following a baseline of techniques and best practices found in the literature this project will show a comparison of multiple reinforcement learning techniques applied in a few common environments.
     In particular, the aim of this project is to implement several Q-learning and policy learning algorithms and compare the results across diverse tasks.
-    In addition, the results attained by this work will be compared to those already reported in established works. This work will serve as an exploration of baseline results for diverse reinforcement learning algorithms, in order to compare and contrast the performance of models on diverse tasks. Potential conclusions of this work could include suggestions for appropriate models given the task, heuristic hyperparameters which work for many models, and potential evidence that some models always outperform others.
+    In addition, the results attained by this work will be analyzed with respect to the expected outcomes of each algorithm on each task.
+    This work will serve as an exploration of baseline results for diverse reinforcement learning algorithms, in order to compare and contrast the performance of models on diverse tasks.
+    Potential conclusions of this work could include suggestions for appropriate models given the task, heuristic hyperparameters which work for many models, and potential evidence that some models always outperform others, though we expect models to succeed and fail based on the inductive biases their structures assume.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -84,17 +86,19 @@ Q-Learning, Policy Learning, DQN, Policy Gradient, Reinforcement Learning
 Project 3 explored how to construct a Deep Q Network (DQN) by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
 Building off of this recent experience this project proposes that deep learning techniques applied to the area of policy learning are implemented and compared to the results of DQNs.
 
-In addition, this project proposes to use \cite{nichol2018retro} as a baseline for the environment and games to use for comparison of techniques as it is considered more difficult than the Atari 2600 games contained in the Arcade Learning Environment \cite{Bellemare_2013}.
-Using this environment multiple agents will be trained using policy learning techniques such as vanilla policy gradient, proximal policy optimization (PPO), and trust region policy optimization (TRPO), with the final cast of models to be determined based on compute-time.
+In addition, this project proposes to use the \cite{DQNOriginalPaper} breakout screen capture game as a baseline for the environment and games to use for comparison of techniques as it is considered more difficult than the Atari 2600 games contained in the Arcade Learning Environment \cite{Bellemare_2013}. The results on this discrete action-space game will be contrasted to the results of training our set of models on the continuous action space game <GAMEHERE>. Though all of our models can be applied to both discrete and continuous action games, we expect very differetn results and ideally will find that no one model outperforms all others across both tasks. Time permitting, we can add additional tasks which differ from the previous two games, to refine our sense of why some models would outperform others given the context of the experiment.
+Using this environment multiple agents will be trained using policy learning techniques such as vanilla policy gradient, proximal policy optimization (PPO), Monte Carlo policy gradient, with the final cast of models and hyperparameters selected based on compute-time available.
 
-The results of these agents will then be compared to trained Q-learning agents implemented as a DQN, Double DQN (DDQN), and Dueling DDQN (for example); while using the results to assess the strengths and weaknesses of each. By comparing multiple agents across multiple games we will create a case for the superiority or inferiority of some algorithms to others, or find that there is no one algorithm which consistently outperforms others.
+The results of these agents will then be compared to trained Q-learning agents implemented as a DQN, Double DQN, Dueling DQN, and Dueling Double DQN (D3QN); while using the results to assess the strengths and weaknesses of each. By comparing multiple agents across multiple games we will create a case for the superiority or inferiority of some algorithms to others by finding or disproving that there is no one algorithm which consistently outperforms others.
 
-The remainder of this proposal is as follows.
-Section II provides background information regarding the methods planned to be implemented.
-Section III outlines the specific work planned for this project.
-Section IV proposes a timeline for the completion of project milestones.
-Section VI indicates the expected deliverables to be generated and provided as part of this work.
-Finally, the proposal concludes in section VII.
+The remainder of this progress report is as follows:
+\begin{itemize}
+\item Section II provides background information regarding the methods planned to be implemented.
+\item Section III outlines the specific work planned for this project.
+\item Section IV proposes a timeline for the completion of project milestones.
+\item Section VI indicates the expected deliverables to be generated and provided as part of this work.
+\item Finally, the proposal concludes in section VII.
+\end{itemize}
 
 \section{Background Information}
 Our goals may change for implementation. For example, we may focus on a smaller amount of models and instead compare tweaks on these algorithms to demonstrate and quantify the improvement they offer.
@@ -106,6 +110,8 @@ Double deep Q networks address the maximization bias problem from Deep q learnin
 
 \subsection{Dueling Deep Q Learning}
 Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states. For this reason this different approach will be interseting to analyze on tasks where the actions might not always directly affect the environment.
+
+\subsection{Dueling Double Deep Q Learning}
 
 \section{Planned Work}
 
