@@ -86,7 +86,7 @@ Q-Learning, Policy Learning, DQN, Policy Gradient, Reinforcement Learning
 Project 3 explored how to construct a Deep Q Network (DQN) by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
 Building off of this recent experience this project proposes that deep learning techniques applied to the area of policy learning are implemented and compared to the results of DQNs.
 
-In addition, this project proposes to use the \cite{DQNOriginalPaper} breakout screen capture game as a baseline for the environment and games to use for comparison of techniques as it is considered more difficult than the Atari 2600 games contained in the Arcade Learning Environment \cite{Bellemare_2013}. The results on this discrete action-space game will be contrasted to the results of training our set of models on the continuous action space game Box2D BipedalWalker-v2 \footnote{https://gym.openai.com/envs/#box2d}. Though all of our models can be applied to both discrete and continuous action games, we expect very different results and ideally will find that no one model outperforms all others across both tasks. Time permitting, we can add additional tasks which differ from the previous two games, to refine our sense of why some models would outperform others given the context of the experiment.
+In addition, this project proposes to use the \cite{DQNOriginalPaper} breakout screen capture game as a baseline for the environment and games to use for comparison of techniques as it is considered more difficult than the Atari 2600 games contained in the Arcade Learning Environment \cite{Bellemare_2013}. The results on this discrete action-space game will be contrasted to the results of training our set of models on the continuous action space game Box2D BipedalWalker-v2 \footnote{https://gym.openai.com/envs/\#box2d}. Though all of our models can be applied to both discrete and continuous action games, we expect very different results and ideally will find that no one model outperforms all others across both tasks. Time permitting, we can add additional tasks which differ from the previous two games, to refine our sense of why some models would outperform others given the context of the experiment.
 Using this environment multiple agents will be trained using policy learning techniques such as vanilla policy gradient, proximal policy optimization (PPO), Monte Carlo policy gradient, with the final cast of models and hyperparameters selected based on compute-time available.
 
 The results of these agents will then be compared to trained Q-learning agents implemented as a DQN, Double DQN, and Dueling DQN; while using the results to assess the strengths and weaknesses of each. By comparing multiple agents across multiple games we will create a case for the superiority or inferiority of some algorithms to others by finding or disproving that there is no one algorithm which consistently outperforms others.
@@ -109,6 +109,36 @@ Double deep Q networks address the maximization bias problem from Deep q learnin
 
 \subsection{Dueling Deep Q Learning}
 Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states by accounting for a learned state-value function $V(s)$, as well as an advantage function $A(s,a)$ interpreted as the value of taking action $a$ while in state $s$. For this reason this different approach will be interseting to analyze on tasks where the actions might not always directly affect the environment, for example in breakout where many movements have no direct affect on the game environment.
+
+\subsection{Basic Policy Gradient}
+Policy gradient algorithms in general are methods that learn a parameterized policy that can select actions without consulting a value function \cite{ReinforcementLearningBook}.
+A value function may be utilized or learned to support learning a given policy, however, it is not involved in the process of choosing an action with these methods \cite{ReinforcementLearningBook}.
+The Basic Policy Gradient algorithm treats learning of the policy as an episodic case using a performance measure that equates to the reward obtained following the current policy given a starting state of an episode. 
+At its core, the Basic Policy Gradient algorithm takes the gradient of expected rewards for an episode and uses it to update the policy parameters.
+This can be summarized by the two equations below,
+
+$$\nabla \bar{R}_{\theta} = \frac{1}{N} \sum \limits_{n=1}^N \sum \limits_{t=1}^{T_n} R(\tau^n) \nabla log\pi_{\theta}(a_{t}^n | s_{t}^n)$$
+
+$$\theta = \theta  + \eta \nabla \bar{R}_{\theta}$$
+
+where N is the number of episodes, T is the steps within an episode, R is the reward for a given episode, $\theta$ are the policy parameters, a is a given action, and s is a given state.
+
+Implemented in pseudocode, this algorithm would be similar to Listing \ref{listing:basicPolicyGradientAlg}.
+
+\begin{lstlisting}[
+    float=t,
+    caption=\textbf{Basic Policy Gradient} The basic policy gradient algorithm,
+    label=listing:basicPolicyGradientAlg,
+]
+
+Loop until stopping criteria met:
+    for a batch of episodes:
+        - Step through episode
+        - Store reward gained
+
+    - Determine reward gradient of batch
+    - Update policy parameters
+\end{lstlisting}
 
 \section{Planned Work} \label{planned}
 
@@ -136,9 +166,9 @@ We will incorporate our knowledge from researching capabilities of the models as
 
 \subsection{Work Completed}
 
-Our largest contribution to the final deliverable so far is the developement of an agent-game pair running file, in which the researcher inputs arguments into the terminal corresponding to the model and task they would like to dispatch for training. This means all of our model implementations must be written such that they are indifferent to different environment types, state shapes, model attributes, or other quirks arising in agent training. This means that all agents must inherit from a superclass of a general agent framework, and particularities in training (such as the difference between training on state-action-reward tuples, episodes, or tuples of episodes must be addressed in one exectution of the model's unique 'train()' function, which is called in the general 'agent_runner' executed file.
-At the testing time determined by the 'agent_runner' call, this same process occurs though in a simpler fashion where the generic 'agent.make_action' refers to a trained policy and state-value function to play the game it was trained on.
-The developement of this general dispatcher will serve two primary purposes for the remaining work of the project. First, this shared dispatcher file will assure consistent running of each model, where changes can be made to environments and shared parameters without needing to rely on manual changes to many ($num_tasks*num_agents$) files. Second, this greatly expedites batch computation when training models on cluster computers, as we can serialize calls for any number of agents, games, and hyperparameters as we see necessary.
+Our largest contribution to the final deliverable so far is the development of an agent-game pair running file, in which the researcher inputs arguments into the terminal corresponding to the model and task they would like to dispatch for training. This means all of our model implementations must be written such that they are indifferent to different environment types, state shapes, model attributes, or other quirks arising in agent training. This means that all agents must inherit from a superclass of a general agent framework, and particularities in training (such as the difference between training on state-action-reward tuples, episodes, or tuples of episodes must be addressed in one exectution of the model's unique 'train()' function, which is called in the general 'agent\_runner' executed file.
+At the testing time determined by the 'agent\_runner' call, this same process occurs though in a simpler fashion where the generic 'agent.make\_action' refers to a trained policy and state-value function to play the game it was trained on.
+The development of this general dispatcher will serve two primary purposes for the remaining work of the project. First, this shared dispatcher file will assure consistent running of each model, where changes can be made to environments and shared parameters without needing to rely on manual changes to many ($num\_tasks*num\_agents$) files. Second, this greatly expedites batch computation when training models on cluster computers, as we can serialize calls for any number of agents, games, and hyperparameters as we see necessary.
 
 So far, we have draft versions of the following algorithms:
 \begin{enumerate}
@@ -151,7 +181,7 @@ So far, we have draft versions of the following algorithms:
 The following algorithms are unstarted or in a very early stage:
 \begin{enumerate}
 \item Policy Gradient PPO
-\item Others we add?
+\item Basic Policy Gradient
 \end{enumerate}
 
 \subsection{Paper Preparation}
