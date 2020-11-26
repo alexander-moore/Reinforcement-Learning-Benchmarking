@@ -128,6 +128,10 @@ class SampleAgent(Agent):
 
         # Update parameters
         self.optimizer.step()
+
+        # Periodically update target model
+        if step % self.target_update_steps == 0:
+            self.target_model = copy.deepcopy(self.model)
         
         # Return loss
         return loss.detach().item()
