@@ -126,18 +126,19 @@ We plan to take advantage of the provided framework from Project 3 to reduce the
 
 \subsection{Algorithm Implementations}
 The algorithm implementations involve taking the actual theoretical algorithms and implementing them in Python code using common libraries such as PyTorch and NumPy.
-The goal of these implementations is to be true to the algorithms and any notable improvements that have become commonplace in practice.
-While deviations and modifications to these algorithms may become necessary for practical reasons, they will be noted in the final report provided.
+The goal of these implementations is to be true to the algorithms and any notable improvements that have become common in practice.
+While deviations and modifications to these algorithms may become necessary for practical reasons, they will be noted in the final report provided, and no modifications would be made which fundamentally alters the bahavior of agents in the games we are testing. The primary goal is to evaluate convergence speed, time to a goal score, and consistency of results across tasks.
 
 \subsection{Results Analysis}
 During the analysis of the results each model will be compared using common metrics such reward per episode and the number of episodes necessary for convergence.
 In addition, commentary will be provided of any interesting results or findings from the experiments that do not fit into the objective metrics being measured.
-We will incorporate our knowledge from researching capabilities of the models as well as our intuitions gained from implementing the algorithms to analyze their performances in both testing and training. After considering case-by-case performances of each model, we can consider the field of agents to determine if there is a subset of 'best' models which consistently outperformed their peers, and maintained that success even across diverse tasks.
+We will incorporate our knowledge from researching capabilities of the models as well as our intuitions gained from implementing the algorithms to analyze their performances in both testing and training. After considering case-by-case performances of each model, we can consider the field of agents to determine if there is a subset of 'best' models which consistently outperformed their peers, and maintained that success even across diverse tasks. Ranking quality of models across these tasks can be done with metrics such as training time to achieve a threshold score, max score reached given a limited training time, and consistency of performance across tasks.
 
 \subsection{Work Completed}
 
 Our largest contribution to the final deliverable so far is the developement of an agent-game pair running file, in which the researcher inputs arguments into the terminal corresponding to the model and task they would like to dispatch for training. This means all of our model implementations must be written such that they are indifferent to different environment types, state shapes, model attributes, or other quirks arising in agent training. This means that all agents must inherit from a superclass of a general agent framework, and particularities in training (such as the difference between training on state-action-reward tuples, episodes, or tuples of episodes must be addressed in one exectution of the model's unique `train()` function, which is called in the general `agent_runner` executed file.
 At the testing time determined by the `agent_runner` call, this same process occurs though in a simpler fashion where the generic `agent.make_action` refers to a trained policy and state-value function to play the game it was trained on.
+The developement of this general dispatcher will serve two primary purposes for the remaining work of the project. First, this shared dispatcher file will assure consistent running of each model, where changes can be made to environments and shared parameters without needing to rely on manual changes to many (num_tasks*num_agents) files. Second, this greatly expedites batch computation when training models on cluster computers, as we can serialize calls for any number of agents, games, and hyperparameters as we see necessary.
 
 \subsection{Paper Preparation}
 A roughly 10 page paper will be put together to conclude this project and communicate its findings.
