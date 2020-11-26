@@ -108,7 +108,7 @@ Deep Q learning uses a deep neural network to learn coefficients $\omega$ such t
 Double deep Q networks address the maximization bias problem from Deep q learning by instead letting two Q functions randomly select the action and update the corresponding Q function. This process inhibits bias and will potentially converge faster or outright outperform DQN on all tasks.
 
 \subsection{Dueling Deep Q Learning}
-Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states by accounting for a learned state-value function $V(s)$, as well as an advantage function $A(s,a)$ interpreted as the value of taking action $a$ while in state $s$. For this reason this different approach will be interseting to analyze on tasks where the actions might not always directly affect the environment, for example in breakout where many movements have no direct affect on the game environment.
+Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states by accounting for a learned state-value function $V(s)$, as well as an advantage function $A(s,a)$ interpreted as the value of taking action $a$ while in state $s$. For this reason this different approach will be interesting to analyze on tasks where the actions might not always directly affect the environment, for example in breakout where many movements have no direct affect on the game environment.
 
 \subsection{Basic Policy Gradient}
 Policy gradient algorithms in general are methods that learn a parameterized policy that can select actions without consulting a value function \cite{ReinforcementLearningBook}.
@@ -160,6 +160,9 @@ end for
 return $$\theta$$
 \end{lstlisting}
 
+\subsection{PPO Policy Gradient}
+Unlike the Basic and REINFORCE policy gradient algorithms, the Proximal Policy Optimization (PPO) algorithm is an off-policy method, where the performance assessment and improvement of a policy is different than the one used for action selection (or sampling). The separate policies allow the collected data to be used more than once, which result in faster performance. PPO also addresses other shortcomings of the Basic Policy Gradient by subtracting the state-value off as the baseline to improve update accuracy when rewards are non-negative via an Advantage function. This function also serves to reduce large variance without increasing bias. Finally, PPO improves stability by imposing a constraint on the distance (or difference) between the old and new policies by clipping their ratio to a small interval around one.
+
 \section{Planned Work} \label{planned}
 
 \subsection{Background Research}
@@ -177,7 +180,7 @@ We plan to take advantage of the provided framework from Project 3 to reduce the
 \subsection{Algorithm Implementations}
 The algorithm implementations involve taking the actual theoretical algorithms and implementing them in Python code using common libraries such as PyTorch and NumPy.
 The goal of these implementations is to be true to the algorithms and any notable improvements that have become common in practice.
-While deviations and modifications to these algorithms may become necessary for practical reasons, they will be noted in the final report provided, and no modifications would be made which fundamentally alters the bahavior of agents in the games we are testing. The primary goal is to evaluate convergence speed, time to a goal score, and consistency of results across tasks.
+While deviations and modifications to these algorithms may become necessary for practical reasons, they will be noted in the final report provided, and no modifications would be made which fundamentally alters the behavior of agents in the games we are testing. The primary goal is to evaluate convergence speed, time to a goal score, and consistency of results across tasks.
 
 \subsection{Results Analysis}
 During the analysis of the results each model will be compared using common metrics such reward per episode and the number of episodes necessary for convergence.
@@ -186,7 +189,7 @@ We will incorporate our knowledge from researching capabilities of the models as
 
 \subsection{Work Completed}
 
-Our largest contribution to the final deliverable so far is the development of an agent-game pair running file, in which the researcher inputs arguments into the terminal corresponding to the model and task they would like to dispatch for training. This means all of our model implementations must be written such that they are indifferent to different environment types, state shapes, model attributes, or other quirks arising in agent training. This means that all agents must inherit from a superclass of a general agent framework, and particularities in training (such as the difference between training on state-action-reward tuples, episodes, or tuples of episodes must be addressed in one exectution of the model's unique 'train()' function, which is called in the general 'agent\_runner' executed file.
+Our largest contribution to the final deliverable so far is the development of an agent-game pair running file, in which the researcher inputs arguments into the terminal corresponding to the model and task they would like to dispatch for training. This means all of our model implementations must be written such that they are indifferent to different environment types, state shapes, model attributes, or other quirks arising in agent training. This means that all agents must inherit from a superclass of a general agent framework, and particularities in training (such as the difference between training on state-action-reward tuples, episodes, or tuples of episodes must be addressed in one execution of the model's unique 'train()' function, which is called in the general 'agent\_runner' executed file.
 At the testing time determined by the 'agent\_runner' call, this same process occurs though in a simpler fashion where the generic 'agent.make\_action' refers to a trained policy and state-value function to play the game it was trained on.
 The development of this general dispatcher will serve two primary purposes for the remaining work of the project. First, this shared dispatcher file will assure consistent running of each model, where changes can be made to environments and shared parameters without needing to rely on manual changes to many ($num\_tasks*num\_agents$) files. Second, this greatly expedites batch computation when training models on cluster computers, as we can serialize calls for any number of agents, games, and hyperparameters as we see necessary.
 
@@ -200,7 +203,7 @@ So far, we have draft versions of the following algorithms:
 
 The following algorithms are unstarted or in a very early stage:
 \begin{enumerate}
-\item Policy Gradient PPO
+\item PPO Policy Gradient
 \item Basic Policy Gradient
 \end{enumerate}
 
@@ -215,14 +218,14 @@ If any work is found to be an interesting demo it would be displayed during the 
     \item Expected score in testing after a fixed training time in seconds or iterations for each game
     \item Necessary training time in seconds or iterations to achieve a fixed score for each game
     \item Comparison of learning rates of models for each game
-    \item Meta-comparison of games, their action spaces, and relevant challenges and tasks. This will include discussion on the nature of each algorithm as well as our expectations for the performance given the quirks of each task. We will include mathemematical intuition for why some models would struggle or fial to learn in some environments.
+    \item Meta-comparison of games, their action spaces, and relevant challenges and tasks. This will include discussion on the nature of each algorithm as well as our expectations for the performance given the quirks of each task. We will include mathematical intuition for why some models would struggle or fail to learn in some environments.
 \end{itemize}
 
 \section{Tools and Environment}
 
 \subsection{Implementation Language}
 This project will be using the Python language of at least version 3.7.
-In addition to the standard libraries, it is expected that the following additional libraries will be utilized and standardized across group developement machines:
+In addition to the standard libraries, it is expected that the following additional libraries will be utilized and standardized across group development machines:
  
 \begin{itemize}
     \item Gym Retro \cite{nichol2018retro}
@@ -237,7 +240,7 @@ In addition, the framework from Project 3 will be utilized as a baseline for imp
 \subsection{Reinforcement Learning Environment}
 This project plans to use an existing reinforcement learning environment while assessing the various algorithm implementations.
 In particular, the Retro Learning Environment \cite{nichol2018retro} will be utilized for its large selection of games with high levels of complexity.
-We maintain the usage of the Atari Breakout gym environement for multiple reasons. The breakout environment will be familiar to our peers as something they worked extensively with on project 3, and know the implementation tricks as well as the expected rewards of a DQN model, for example. This will contextualize a results plot which shows perhaps that DQN is outperformed by other models, to some comprehensible scale.
+We maintain the usage of the Atari Breakout gym environment for multiple reasons. The breakout environment will be familiar to our peers as something they worked extensively with on project 3, and know the implementation tricks as well as the expected rewards of a DQN model, for example. This will contextualize a results plot which shows perhaps that DQN is outperformed by other models, to some comprehensible scale.
 In addition, it maintains the same API as the environment used in Project 3 making it close to a drop-in replacement for the existing Project 3 framework with our mentioned extensions to add robustness to model differences, game flexibility, and other algorithm needs.
 
 The initial plan was to focus on the games explored in \cite{bhonker2017playing} as there is a baseline result for several algorithms and a known level of complexity.
