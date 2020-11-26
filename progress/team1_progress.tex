@@ -140,6 +140,20 @@ Our largest contribution to the final deliverable so far is the developement of 
 At the testing time determined by the `agent_runner` call, this same process occurs though in a simpler fashion where the generic `agent.make_action` refers to a trained policy and state-value function to play the game it was trained on.
 The developement of this general dispatcher will serve two primary purposes for the remaining work of the project. First, this shared dispatcher file will assure consistent running of each model, where changes can be made to environments and shared parameters without needing to rely on manual changes to many (num_tasks*num_agents) files. Second, this greatly expedites batch computation when training models on cluster computers, as we can serialize calls for any number of agents, games, and hyperparameters as we see necessary.
 
+So far, we have draft versions of the following algorithms:
+\begin{enumerate}
+\item Policy Gradient REINFORCE
+\item DQN
+\item Double DQN
+\item Dueling DQN
+\end{enumerate}
+
+The following algorithms are unstarted or in a very early stage:
+\begin{enumerate}
+\item Policy Gradient PPO
+\item Others we add?
+\end{enumerate}
+
 \subsection{Paper Preparation}
 A roughly 10 page paper will be put together to conclude this project and communicate its findings.
 This paper will include any background information necessary for the project, a description of algorithms used and considered, implementation methods, results, and analysis.
@@ -151,7 +165,7 @@ If any work is found to be an interesting demo it would be displayed during the 
     \item Expected score in testing after a fixed training time in seconds or iterations for each game
     \item Necessary training time in seconds or iterations to achieve a fixed score for each game
     \item Comparison of learning rates of models for each game
-    \item Meta-comparison of games, their action spaces, and relevant challenges and tasks
+    \item Meta-comparison of games, their action spaces, and relevant challenges and tasks. This will include discussion on the nature of each algorithm as well as our expectations for the performance given the quirks of each task. We will include mathemematical intuition for why some models would struggle or fial to learn in some environments.
 \end{itemize}
 
 \section{Tools and Environment}
