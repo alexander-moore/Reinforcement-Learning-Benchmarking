@@ -86,7 +86,7 @@ Q-Learning, Policy Learning, DQN, Policy Gradient, Reinforcement Learning
 Project 3 explored how to construct a Deep Q Network (DQN) by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
 Building off of this recent experience this project proposes that deep learning techniques applied to the area of policy learning are implemented and compared to the results of DQNs.
 
-In addition, this project proposes to use the \cite{DQNOriginalPaper} breakout screen capture game as a baseline for the environment and games to use for comparison of techniques as it is considered more difficult than the Atari 2600 games contained in the Arcade Learning Environment \cite{Bellemare_2013}. The results on this discrete action-space game will be contrasted to the results of training our set of models on the continuous action space game Box2D BipedalWalker-v2 \footnote{https://gym.openai.com/envs/\#box2d}. Though all of our models can be applied to both discrete and continuous action games, we expect very different results and ideally will find that no one model outperforms all others across both tasks. Time permitting, we can add additional tasks which differ from the previous two games, to refine our sense of why some models would outperform others given the context of the experiment.
+In addition, this project proposes to use the Breakout screen capture game as a baseline for the environment and games to use for comparison of techniques as it is considered more difficult than the Atari 2600 games contained in the Arcade Learning Environment \cite{Bellemare_2013, DQNOriginalPaper}. The results on this discrete action-space game will be contrasted to the results of training our set of models on the continuous action space game Box2D BipedalWalker-v2 \footnote{https://gym.openai.com/envs/\#box2d}. Though all of our models can be applied to both discrete and continuous action games, we expect very different results and ideally will find that no one model outperforms all others across both tasks. Time permitting, we can add additional tasks which differ from the previous two games, to refine our sense of why some models would outperform others given the context of the experiment.
 Using this environment multiple agents will be trained using policy learning techniques such as vanilla policy gradient, proximal policy optimization (PPO), Monte Carlo policy gradient, with the final cast of models and hyperparameters selected based on compute-time available.
 
 The results of these agents will then be compared to trained Q-learning agents implemented as a DQN, Double DQN, and Dueling DQN; while using the results to assess the strengths and weaknesses of each. By comparing multiple agents across multiple games we will create a case for the superiority or inferiority of some algorithms to others by finding or disproving that there is no one algorithm which consistently outperforms others.
@@ -147,17 +147,19 @@ This change can be seen in the pseudocode below:
 Listing \ref{listing:reinforcePolicyGradientAlg}.
 
 \begin{lstlisting}[
-    float=t,
+    float=h,
+    mathescape = true
     caption=\textbf{REINFORCE Policy Gradient} The reinforce policy gradient algorithm,
     label=listing:reinforcePolicyGradientAlg,
 ]
 
 For each episode from the current policy:
     For t=1 to T-1 do:
-        $$\theta = \theta  + \alpha \nabla_{\theta} log\pi_{\theta}(s_t, a_t)G_t$$
+        {$\theta = \theta  + \alpha \nabla_{\theta} log\pi_{\theta}(s_t, a_t)G_t$}
+
     end for
 end for
-return $$\theta$$
+return {$\theta$}
 \end{lstlisting}
 
 \subsection{PPO Policy Gradient}
@@ -168,7 +170,7 @@ Unlike the Basic and REINFORCE policy gradient algorithms, the Proximal Policy O
 \subsection{Background Research}
 Research is planned to be performed to understand all of the techniques to be exercised during this project.
 In addition, the literature will be surveyed to identify any recent developments or improvements related to the methods being employed.
-While doing this, we also plan to obtain available benchmarks for techniques such as those found in \cite{DQNOriginalPaper}, \cite{NatureDeepLearning}, and \cite{bhonker2017playing}.
+While doing this, we also plan to obtain available benchmarks for techniques such as those found in \cite{DQNOriginalPaper, NatureDeepLearning, bhonker2017playing}.
 To keep experiments fair to models and reduce compute time, we will find hyperparameter suggestions by model authors where available, but not directly tune one model's hyperparameters for a single game task. Rather, heuristics will be used in their place to attempt to simultaneously generalize models across tasks while keeping experimental design relatively fair.
 
 \subsection{Environment Setup}
