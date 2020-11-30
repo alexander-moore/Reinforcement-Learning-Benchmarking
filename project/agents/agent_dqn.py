@@ -153,7 +153,7 @@ class Agent_DQN(Agent):
         
         states = torch.stack(states, axis = 0).reshape(self.batch_size, self.game_size)
         Q_out = self.Q(states)
-        # HERE DOWN:
+        # HERE DOWN NEEDS HELP:
         outlist = torch.zeros((self.batch_size, 1), device = device)
 
         loss = loss_func(outlist, torch.Tensor(yj).reshape(16,1))
