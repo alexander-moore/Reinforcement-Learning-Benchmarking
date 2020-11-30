@@ -20,7 +20,7 @@ you can import any package and define any extra function as you need
 """
 
 
-class SampleAgent(Agent):
+class REINFORCE(Agent):
     def __init__(self, env, args, model, device):
         """
         Initialize everything you need here.
@@ -32,9 +32,11 @@ class SampleAgent(Agent):
             ...
         """
 
-        super(SampleAgent, self).__init__(env, args, model, device)
+        super(REINFORCE, self).__init__(env, args, model, device)
         ###########################
         # YOUR IMPLEMENTATION HERE #
+        self.num_actions = self.env.action_space.n
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # Load optimizer and loss function here
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
@@ -102,6 +104,7 @@ class SampleAgent(Agent):
         ###########################
         # YOUR IMPLEMENTATION HERE #
         # Reset our gradient
+        print("Training")
         self.optimizer.zero_grad()
 
         # Get Full-batch for training
@@ -116,7 +119,7 @@ class SampleAgent(Agent):
             log_probabilities.append(self.calculate_log_prob(state, action))
             Gt = 0
             step = 0
-            for reward in training_rewards[i:]:
+            for reward in [training_rewards][i:-1]:
                 Gt += self.gamma ** step * reward
                 step += 1
             returns.append(Gt)
