@@ -115,8 +115,8 @@ class SampleAgent(Agent):
         # Obtain target Q values
         with torch.no_grad():
             target_Q = self.target_model(torch.from_numpy(training_next_states.transpose(0, 3, 1, 2)).float().to(self.device))
-            target_A = torch.argmax(self.model(torch.from_numpy(training_next_states.transpose(0, 3, 1, 2)).float().to(self.device)), dim=1)
-            target_Q_A = target_Q.gather(1, target_A.unsqueeze(-1)).squeeze()
+            target_Q_A = target_Q.max(dim=1)[0]
+            target_Q_A_idx = target_Q.argmax(dim=1)
             target_Q_A[training_dones] = 0.0
             target_Q_A = torch.from_numpy(training_rewards).to(self.device) + (target_Q_A * self.gamma)
 
