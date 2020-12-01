@@ -114,14 +114,15 @@ class SampleAgent(Agent):
 
         # Obtain target Q values
         with torch.no_grad():
-            target_Q = self.target_model(torch.from_numpy(training_next_states.transpose(0, 3, 1, 2)).float().to(self.device))
-            target_Q_A = target_Q.max(dim=1)[0]
-            target_Q_A_idx = target_Q.argmax(dim=1)
-            target_Q_A[training_dones] = 0.0
-            target_Q_A = torch.from_numpy(training_rewards).to(self.device) + (target_Q_A * self.gamma)
+            Q_next = self.model(torch.from_numpy(training_next_states.transpose(0,3,1,2)).float().to(self.device))
+            Qtarg_next = self.target_model(torch.from_numpy(training_next_states.transpose(0,3,1,2)).float().to(self.device))
+            online_max_action = torch.argmax(Q_next, dim=1, keepdim=True)
+            y = training_rewards + (1 - training_dones)*self.gamma* Qtarg_next.gather(1, online_max_action.long())
+            
 
         # Calculate our loss
-        loss = self.criterion(predicted_Q_A.float(), target_Q_A.float())
+        loss = self.criterion(Q_next(training_states).gather(1, training_actions.long()), y)
+        self.optimizer.zero_grad()
     
         # Perform gradient descent
         loss.backward()
