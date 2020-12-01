@@ -104,7 +104,6 @@ class REINFORCE(Agent):
         ###########################
         # YOUR IMPLEMENTATION HERE #
         # Reset our gradient
-        print("Training")
         self.optimizer.zero_grad()
 
         # Get Full-batch for training
