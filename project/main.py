@@ -27,6 +27,10 @@ def list_agents_and_models():
 
     print('')
     print('    Agents Available:')
+    
+    # print games we have implemented support for
+    print('Breakout-v0')
+    print('car_game, find env argument to make')
 
     # Get all classes in those files
     for af in agent_files:
