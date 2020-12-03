@@ -62,10 +62,12 @@ def list_agents_and_models():
             continue
         
         # Get module name from file name
+        print('--agent arguments:')
         _, file_name = os.path.split(mf)
         file_name = file_name.replace('.py', '')
 
         # Get agent classes from file
+        print('--model arguments:')
         with open(mf, 'r') as f:
             lines = f.readlines()
         for line in lines:
