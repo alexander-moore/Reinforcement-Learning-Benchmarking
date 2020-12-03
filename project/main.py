@@ -85,7 +85,7 @@ def run(args):
 
     # Load the environment
     env_name = args.env_name or 'BreakoutNoFrameskip-v4'
-    env = Environment(env_name, args, atari_wrapper=True)
+    env = Environment(env_name, args, atari_wrapper=(not args.no_atari_wrapper))
 
     # Dynamically load an agent
     agents_module = importlib.import_module(f'agents.{agent_module}')

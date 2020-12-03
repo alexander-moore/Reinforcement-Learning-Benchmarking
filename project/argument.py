@@ -28,5 +28,6 @@ def add_arguments(parser):
     parser.add_argument('--model_path', type=str, default=None, help='Path to model weights to load.')
     parser.add_argument('--optimizer_path', type=str, default=None, help='Path to optimizer weights to load.')
     parser.add_argument('--list', action='store_true', help='Lists out all of the available models and agents.')
+    parser.add_argument('--no_atari_wrapper', action='store_true', help='Use this option when using an atari game.')
 
     return parser
