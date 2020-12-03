@@ -23,17 +23,18 @@ def parse():
 
 def list_agents_and_models():
     # Get all files in agents directory
+    print('    Environments Available: (--env_name)')
+    print('Breakout-v0')
+    print('MountainCar-v0')
     agent_files = glob.glob('./agents/*.py')
 
     print('')
-    print('    Agents Available:')
-    
+    print('    Agents Available: --agent')
     # print games we have implemented support for
     print('Breakout-v0')
     print('car_game, find env argument to make')
 
     # Get all classes in those files
-    print('--agent arguments:')
     for af in agent_files:
         if '__init__' in af or 'replay_buffer' in af:
             continue
@@ -55,7 +56,7 @@ def list_agents_and_models():
     model_files = glob.glob('./models/*.py')
 
     print('')
-    print('    Models Available:')
+    print('    Models Available: (--model)')
 
     # Get all classes in those files
     print('--model arguments:')
