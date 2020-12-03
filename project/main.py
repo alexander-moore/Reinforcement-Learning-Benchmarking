@@ -33,6 +33,7 @@ def list_agents_and_models():
     print('car_game, find env argument to make')
 
     # Get all classes in those files
+    print('--agent arguments:')
     for af in agent_files:
         if '__init__' in af or 'replay_buffer' in af:
             continue
@@ -57,17 +58,16 @@ def list_agents_and_models():
     print('    Models Available:')
 
     # Get all classes in those files
+    print('--model arguments:')
     for mf in model_files:
         if '__init__' in mf:
             continue
         
         # Get module name from file name
-        print('--agent arguments:')
         _, file_name = os.path.split(mf)
         file_name = file_name.replace('.py', '')
 
         # Get agent classes from file
-        print('--model arguments:')
         with open(mf, 'r') as f:
             lines = f.readlines()
         for line in lines:
