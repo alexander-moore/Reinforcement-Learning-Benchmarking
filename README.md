@@ -2,6 +2,9 @@
 Quincy and Brian and Alex and Scott and Jannik
 
 Select environments from here:
+https://gym.openai.com/envs/Breakout-v0/
+https://gym.openai.com/envs/CarRacing-v0/
+
 https://gym.openai.com/envs/#atari
 
 Select some set of models from here:
