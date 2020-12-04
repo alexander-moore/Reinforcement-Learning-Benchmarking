@@ -57,21 +57,21 @@ class SampleAgent(Agent):
         # YOUR IMPLEMENTATION HERE #
         # with torch.no_grad(): ?
         if np.random.rand(1) < 1. - epsilon or test:
-        	print(np.array([observation]))
-        	print(np.array([observation]).shape)
-        	print(self.model)
-        	print(dir(self.env))
+        	#print(np.array([observation]))
+        	#print(np.array([observation]).shape)
+        	#print(self.model)
+        	#print(dir(self.env))
         	if self.env.env.unwrapped.spec.id == 'Breakout-v0':
         		actions = self.model.forward(torch.from_numpy(np.array([observation]).transpose(0, 3, 1, 2)).float().to(self.device))
         	elif self.env.env.unwrapped.spec.id == 'MountainCar-v0':
-        		print(torch.from_numpy(np.array([observation])).float().to(self.device).shape)
+        		#print(torch.from_numpy(np.array([observation])).float().to(self.device).shape)
         		actions = self.model.forward(torch.from_numpy(np.array([observation])).float().to(self.device))
-        	print(actions)
+        	#print(actions)
         	action = torch.argmax(actions).item()
         else:
 
             action = np.random.randint(self.env.env.action_space.n)
-        print(action, self.env.env.action_space.n)
+        #print(action, self.env.env.action_space.n)
         ###########################
         return action
     
@@ -125,20 +125,22 @@ class SampleAgent(Agent):
 
         if self.env.env.unwrapped.spec.id == 'Breakout-v0':
         	predicted_Q = self.model(torch.from_numpy(training_states.transpose(0, 3, 1, 2)).float().to(self.device))
+        	predicted_Q_A = predicted_Q.gather(1, torch.from_numpy(training_actions).to(self.device).unsqueeze(1)).squeeze()
         elif self.env.env.unwrapped.spec.id == 'MountainCar-v0':
         	predicted_Q = self.model(torch.from_numpy(training_states).float().to(self.device))
+        	predicted_Q_A = predicted_Q.gather(1, torch.from_numpy(training_actions).type(torch.int64).to(self.device).unsqueeze(1)).squeeze()
 
-
-        predicted_Q_A = predicted_Q.gather(1, torch.from_numpy(training_actions).to(self.device).unsqueeze(1)).squeeze()
+        #print(training_actions.shape)
+        
 
         # Obtain target Q values
         with torch.no_grad():
-            print(training_next_states.shape)
+            #print(training_next_states.shape)
 
             if self.env.env.unwrapped.spec.id == 'Breakout-v0':
                 target_Q = self.target_model(torch.from_numpy(training_next_states.transpose(0, 3, 1, 2)).float().to(self.device))
             elif self.env.env.unwrapped.spec.id == 'MountainCar-v0':
-                target_Q = self.target_model(torch.from_numpy().float().to(self.device))
+                target_Q = self.target_model(torch.from_numpy(training_next_states).float().to(self.device))
 
             target_Q_A = target_Q.max(dim=1)[0]
             target_Q_A_idx = target_Q.argmax(dim=1)
@@ -146,6 +148,7 @@ class SampleAgent(Agent):
             target_Q_A = torch.from_numpy(training_rewards).to(self.device) + (target_Q_A * self.gamma)
 
         # Calculate our loss
+        #print(predicted_Q_A.shape, target_Q_A.shape)
         loss = self.criterion(predicted_Q_A.float(), target_Q_A.float())
     
         # Perform gradient descent
