@@ -43,9 +43,11 @@ class SampleAgent(Agent):
         # Any agent specific items done here
         self.target_model = copy.deepcopy(self.model)
 
-        if self.env.env.unwrapped.spec.id == 'Breakout-v0':
+        self.game_name = self.env.env.unwrapped.spec.id
+
+        if self.game_name == 'Breakout-v0':
         	self.game_shape = (32, 4, 84, 84)
-        elif self.env.env.unwrapped.spec.id == 'MountainCar-v0':
+        elif self.game_name == 'MountainCar-v0':
         	self.game_shape = (32, 2)
 
     def make_action(self, observation, epsilon, test=True):
@@ -128,7 +130,11 @@ class SampleAgent(Agent):
         # Obtain our predictions
         print(self.model, states.shape)
         print(self.model(states).shape)
-        Q_S_A = self.model(states).gather(1, actions)
+        print(actions.shape)
+        if self.game_name == 'Breakout-v0':
+            Q_S_A = self.model(states).gather(1, actions)
+        elif self.game_name == 'MountainCar-v0':
+            Q_S_A = self.model(states).unsqueeze(1).gather(1, actions.unsqueeze(1))
         V_next = Variable(torch.zeros(batch_size, device = self.device))
 
         next_S_A = self.model(next_states).gather(1, actions)
