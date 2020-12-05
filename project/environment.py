@@ -7,7 +7,6 @@ DO NOT revise this file
 import gym
 import numpy as np
 from atari_wrapper import make_wrap_atari
-import ipdb
 
 class Environment(object):
     def __init__(self, env_name, args, atari_wrapper=False, test=False):
