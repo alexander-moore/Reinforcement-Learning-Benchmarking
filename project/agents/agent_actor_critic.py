@@ -37,12 +37,10 @@ class ActorCriticAgent(Agent):
         # YOUR IMPLEMENTATION HERE #
 
         # Create actor and critic models
-        self.actor = self.model_class().to(self.device)
-        self.critic = self.model_class().to(self.device)
+        self.model = self.model_class().to(self.device)
 
         # These actions are a mean and standard deviation
-        self.actor.num_actions = 2
-        self.critic.num_actions = 2
+        self.model.num_actions = 2
 
         self.log_probs = None
 
@@ -50,8 +48,7 @@ class ActorCriticAgent(Agent):
         self.n_outputs = 1
 
         # Load optimizer and loss function here
-        self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=self.lr)
-        self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=self.lr)
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         self.criterion = torch.nn.SmoothL1Loss()
 
         # Any agent specific items done here
@@ -71,7 +68,7 @@ class ActorCriticAgent(Agent):
         # YOUR IMPLEMENTATION HERE #
 
         # Get our return from the network
-        mu, sigma, val = self.actor.forward(torch.from_numpy(np.array([observation]).transpose(0, 3, 1, 2)).float().to(self.device))
+        mu, sigma, val = self.model.forward(torch.from_numpy(observation).float().to(self.device))
 
         # Sample an action from the distribution
         action_probs = torch.distributions.Normal(mu, sigma)
@@ -79,8 +76,7 @@ class ActorCriticAgent(Agent):
 
         # Make sure these are within the proper boundaries
         probs = probs.flatten()
-        probs[0] = torch.tanh(probs[0])
-        probs[1:3] = torch.sigmoid(probs[1:3])
+        probs = torch.tanh(probs)
 
         # Store the log probability for calculating loss later
         self.log_probs = action_probs.log_prob(probs).to(self.device)
@@ -104,8 +100,7 @@ class ActorCriticAgent(Agent):
         #self.buffer.push(replay_entry)
         
         ###########################
-        
-        
+
     def replay_buffer(self):
         """ You can add additional arguments as you need.
         Select batch from buffer.
@@ -136,12 +131,11 @@ class ActorCriticAgent(Agent):
         episode_complete = current_tuple[4]
 
         # Reset our gradients
-        self.actor_optimizer.zero_grad()
-        self.critic_optimizer.zero_grad()
+        self.optimizer.zero_grad()
 
         # Get critic's view
-        _, _, critic_value_ = self.critic.forward(torch.from_numpy(np.array([next_observation]).transpose(0, 3, 1, 2)).float().to(self.device))
-        _, _, critic_value = self.critic.forward(torch.from_numpy(np.array([current_observation]).transpose(0, 3, 1, 2)).float().to(self.device))
+        _, _, critic_value_ = self.model.forward(torch.from_numpy(next_observation).float().to(self.device))
+        _, _, critic_value = self.model.forward(torch.from_numpy(current_observation).float().to(self.device))
         reward = torch.tensor(reward, dtype=torch.float).to(self.device)
         delta = ((reward + self.gamma * critic_value_ * (1 - int(episode_complete))) - critic_value)
 
@@ -153,8 +147,7 @@ class ActorCriticAgent(Agent):
         loss.backward()
 
         # Update parameters
-        self.actor_optimizer.step()
-        self.critic_optimizer.step()
+        self.optimizer.step()
 
         # Return loss
         return loss.detach().item()
