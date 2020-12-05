@@ -23,14 +23,17 @@ def parse():
 
 def list_agents_and_models():
     # Get all files in agents directory
+    print('    Environments Available: (--env_name)')
+    print('Breakout-v0')
+    print('MountainCar-v0')
     agent_files = glob.glob('./agents/*.py')
 
     print('')
-    print('    Agents Available:')
-    
+    print('    Agents Available: --agent')
     # print games we have implemented support for
     print('Breakout-v0')
-    print('car_game, find env argument to make')
+    print('MountainCar-v0')
+    print('MountainCarContinuous-v0')
 
     # Get all classes in those files
     for af in agent_files:
@@ -54,9 +57,10 @@ def list_agents_and_models():
     model_files = glob.glob('./models/*.py')
 
     print('')
-    print('    Models Available:')
+    print('    Models Available: (--model)')
 
     # Get all classes in those files
+    print('--model arguments:')
     for mf in model_files:
         if '__init__' in mf:
             continue
@@ -89,6 +93,10 @@ def run(args):
 
     # Load the environment
     env_name = args.env_name or 'BreakoutNoFrameskip-v4'
+
+    #if env_name == 'MountainCar-v0':
+    #	env = Environment(env_name, args)
+    #else:
     env = Environment(env_name, args, atari_wrapper=(not args.no_atari_wrapper))
 
     # Dynamically load an agent
