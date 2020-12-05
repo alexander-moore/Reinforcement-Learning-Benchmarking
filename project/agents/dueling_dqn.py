@@ -39,6 +39,8 @@ class SampleAgent(Agent):
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         self.criterion = torch.nn.SmoothL1Loss()
 
+        self.env = env
+
         # Any agent specific items done here
         self.target_model = copy.deepcopy(self.model)
 
@@ -105,26 +107,27 @@ class SampleAgent(Agent):
         # Reset our gradient
         self.optimizer.zero_grad()
 
+        self.game_shape = (32,4,84,84)
+
         # Get mini-batch for training
         training_states, training_actions, training_rewards, training_next_states, training_dones = self.replay_buffer()
+        states = torch.FloatTensor(training_states, device = self.device).reshape(self.game_shape)
+        actions = torch.LongTensor(training_actions, device = self.device)
+        rewards = torch.FloatTensor(training_rewards, device = self.device)
+        next_states = torch.FloatTensor(training_next_states, device = self.device).reshape(self.game_shape)
+        dones = torch.FloatTensor(training_dones, device = self.device)
 
-        # Obtain our predictions
-        predicted_Q = self.model(torch.from_numpy(training_states.transpose(0, 3, 1, 2)).float().to(self.device))
-        predicted_Q_A = predicted_Q.gather(1, torch.from_numpy(training_actions).to(self.device).unsqueeze(1)).squeeze()
+        curr_Q = self.model.forward(states).gather(1, actions.unsqueeze(1)).squeeze(1)
 
-        # Obtain target Q values
-        with torch.no_grad():
-            Q_next = self.model(torch.from_numpy(training_next_states.transpose(0,3,1,2)).float().to(self.device))
-            Qtarg_next = self.target_model(torch.from_numpy(training_next_states.transpose(0,3,1,2)).float().to(self.device))
-            online_max_action = torch.argmax(Q_next, dim=1, keepdim=True)
-            y = training_rewards + (1 - training_dones)*self.gamma* Qtarg_next.gather(1, online_max_action.long())
-            
+        next_Q = self.model.forward(next_states)
+        max_next_Q = torch.max(next_Q, 1)[0]
+        #print(rewards)
+        #print(rewards.squeeze(0))
+        expected_Q = rewards + self.gamma*max_next_Q
+        #expected_Q = rewards.squeeze(1) + self.gamma * max_next_Q
 
-        # Calculate our loss
-        loss = self.criterion(Q_next(training_states).gather(1, training_actions.long()), y)
+        loss = torch.nn.functional.mse_loss(curr_Q, expected_Q)
         self.optimizer.zero_grad()
-    
-        # Perform gradient descent
         loss.backward()
 
         # Update parameters
