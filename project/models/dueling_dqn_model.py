@@ -5,7 +5,8 @@ import torch.nn.functional as F
 
 # https://github.com/dxyang/DQN_pytorch/blob/master/model.py
 class Dueling_DQN(nn.Module):
-    def __init__(self, in_channels, num_actions):
+	# init for default game params
+    def __init__(self, in_channels = 4, num_actions = 4):
         super(Dueling_DQN, self).__init__()
         self.num_actions = num_actions
         
