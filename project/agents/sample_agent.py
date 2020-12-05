@@ -57,21 +57,15 @@ class SampleAgent(Agent):
         # YOUR IMPLEMENTATION HERE #
         # with torch.no_grad(): ?
         if np.random.rand(1) < 1. - epsilon or test:
-        	#print(np.array([observation]))
-        	#print(np.array([observation]).shape)
-        	#print(self.model)
-        	#print(dir(self.env))
-        	if self.env.env.unwrapped.spec.id == 'Breakout-v0':
-        		actions = self.model.forward(torch.from_numpy(np.array([observation]).transpose(0, 3, 1, 2)).float().to(self.device))
-        	elif self.env.env.unwrapped.spec.id == 'MountainCar-v0':
-        		#print(torch.from_numpy(np.array([observation])).float().to(self.device).shape)
-        		actions = self.model.forward(torch.from_numpy(np.array([observation])).float().to(self.device))
-        	#print(actions)
-        	action = torch.argmax(actions).item()
+            
+            if self.env.env.unwrapped.spec.id == 'Breakout-v0':
+                actions = self.model.forward(torch.from_numpy(np.array([observation]).transpose(0, 3, 1, 2)).float().to(self.device))
+            elif self.env.env.unwrapped.spec.id == 'MountainCar-v0':
+                actions = self.model.forward(torch.from_numpy(np.array([observation])).float().to(self.device))
+            action = torch.argmax(actions).item()
         else:
-
             action = np.random.randint(self.env.env.action_space.n)
-        #print(action, self.env.env.action_space.n)
+        #prnt(action, self.env.env.action_space.n)
         ###########################
         return action
     
@@ -124,11 +118,11 @@ class SampleAgent(Agent):
 
 
         if self.env.env.unwrapped.spec.id == 'Breakout-v0':
-        	predicted_Q = self.model(torch.from_numpy(training_states.transpose(0, 3, 1, 2)).float().to(self.device))
-        	predicted_Q_A = predicted_Q.gather(1, torch.from_numpy(training_actions).to(self.device).unsqueeze(1)).squeeze()
+            predicted_Q = self.model(torch.from_numpy(training_states.transpose(0, 3, 1, 2)).float().to(self.device))
+            predicted_Q_A = predicted_Q.gather(1, torch.from_numpy(training_actions).to(self.device).unsqueeze(1)).squeeze()
         elif self.env.env.unwrapped.spec.id == 'MountainCar-v0':
-        	predicted_Q = self.model(torch.from_numpy(training_states).float().to(self.device))
-        	predicted_Q_A = predicted_Q.gather(1, torch.from_numpy(training_actions).type(torch.int64).to(self.device).unsqueeze(1)).squeeze()
+            predicted_Q = self.model(torch.from_numpy(training_states).float().to(self.device))
+            predicted_Q_A = predicted_Q.gather(1, torch.from_numpy(training_actions).type(torch.int64).to(self.device).unsqueeze(1)).squeeze()
 
         #print(training_actions.shape)
         
