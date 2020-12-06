@@ -36,6 +36,7 @@ class SampleAgent(Agent):
         # YOUR IMPLEMENTATION HERE #
 
         # Load optimizer and loss function here
+        self.lr = .001
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         self.criterion = torch.nn.SmoothL1Loss()
 

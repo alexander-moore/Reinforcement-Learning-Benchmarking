@@ -41,6 +41,13 @@ class SampleAgent(Agent):
 
         self.env = env
 
+        if self.env.env.unwrapped.spec.id == 'Breakout-v0':
+        	self.game_shape = (-1, 4, 84, 84)
+        	#self.state_shape = (1,4,84,84)
+        elif self.env.env.unwrapped.spec.id == 'MountainCar-v0':
+        	self.game_shape = (-1,2)
+        	#self.state_shape = (1,2)
+
         # Any agent specific items done here
         self.target_model = copy.deepcopy(self.model)
 
@@ -58,7 +65,7 @@ class SampleAgent(Agent):
         # YOUR IMPLEMENTATION HERE #
         # with torch.no_grad(): ?
         if np.random.rand(1) < 1. - epsilon or test:
-            actions = self.model.forward(torch.from_numpy(np.array([observation]).transpose(0, 3, 1, 2)).float().to(self.device))
+            actions = self.model.forward(torch.from_numpy(observation).reshape(self.game_shape).float().to(self.device))
             action = torch.argmax(actions).item()
         else:
             action = np.random.randint(self.env.env.action_space.n)
@@ -107,15 +114,15 @@ class SampleAgent(Agent):
         # Reset our gradient
         self.optimizer.zero_grad()
 
-        self.game_shape = (32,4,84,84)
+        
 
         # Get mini-batch for training
         training_states, training_actions, training_rewards, training_next_states, training_dones = self.replay_buffer()
-        states = torch.FloatTensor(training_states, device = self.device).reshape(self.game_shape)
-        actions = torch.LongTensor(training_actions, device = self.device)
-        rewards = torch.FloatTensor(training_rewards, device = self.device)
-        next_states = torch.FloatTensor(training_next_states, device = self.device).reshape(self.game_shape)
-        dones = torch.FloatTensor(training_dones, device = self.device)
+        states = torch.FloatTensor(training_states).to(self.device).reshape(self.game_shape)
+        actions = torch.LongTensor(training_actions).to(self.device)
+        rewards = torch.FloatTensor(training_rewards).to(self.device)
+        next_states = torch.FloatTensor(training_next_states).to(self.device).reshape(self.game_shape)
+        dones = torch.FloatTensor(training_dones).to(self.device)
 
         curr_Q = self.model.forward(states).gather(1, actions.unsqueeze(1)).squeeze(1)
 
