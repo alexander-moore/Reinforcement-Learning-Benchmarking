@@ -41,7 +41,7 @@ class SampleAgent(Agent):
 
         self.env = env
 
-        if self.env.env.unwrapped.spec.id == 'Breakout-v0':
+        if self.env.env.unwrapped.spec.id == 'BreakoutNoFrameskip-v4 ':
         	self.game_shape = (-1, 4, 84, 84)
         	#self.state_shape = (1,4,84,84)
         elif self.env.env.unwrapped.spec.id == 'MountainCar-v0':
