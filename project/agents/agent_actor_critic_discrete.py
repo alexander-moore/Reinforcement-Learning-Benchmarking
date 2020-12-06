@@ -40,7 +40,7 @@ class ActorCriticAgent(Agent):
         self.model = self.model_class().to(self.device)
 
         # These actions are a mean and standard deviation
-        self.model.num_actions = 2
+        self.model.num_actions = 4
 
         self.log_probs = None
 
@@ -68,23 +68,19 @@ class ActorCriticAgent(Agent):
         # YOUR IMPLEMENTATION HERE #
 
         # Get our return from the network
-        mean, sigma, val = self.model.forward(torch.from_numpy(observation).float().to(self.device))
+        action_probs, _ = self.model.forward(torch.from_numpy(np.array([observation]).transpose(0, 3, 1, 2)).float().to(self.device))
+        probabilities = torch.distributions.Categorical(action_probs)
 
         # Sample an action from the distribution
-        action_distro = torch.distributions.Normal(mean, sigma)
-        raw_action = action_distro.sample(sample_shape=torch.Size([self.n_outputs]))
+        action = probabilities.sample()
 
-        # Make sure these are within the proper boundaries
-        raw_action = raw_action.flatten()
-        action  = torch.tanh(raw_action)
-
-        # Store the log probability for calculating loss later
-        self.log_probs = action_distro.log_prob(action).to(self.device)
+        # Store log probability for learning
+        self.log_probs = probabilities.log_prob(action)
 
         ###########################
 
-        # Return the actual action (probs is a bad name at this point...)
-        return action.cpu().numpy()
+        # Return the actual action
+        return action.item()
     
     def push(self, replay_entry=None):
         """ You can add additional arguments as you need. 
@@ -123,6 +119,9 @@ class ActorCriticAgent(Agent):
         ###########################
         # YOUR IMPLEMENTATION HERE #
 
+        # Reset our gradients
+        self.optimizer.zero_grad()
+
         # Get tuple information
         current_observation = current_tuple[0]
         action = current_tuple[1]
@@ -130,14 +129,12 @@ class ActorCriticAgent(Agent):
         next_observation = current_tuple[3]
         episode_complete = current_tuple[4]
 
-        # Reset our gradients
-        self.optimizer.zero_grad()
-
         # Get critic's view
-        _, _, critic_value_ = self.model.forward(torch.from_numpy(next_observation).float().to(self.device))
-        _, _, critic_value = self.model.forward(torch.from_numpy(current_observation).float().to(self.device))
+        _, critic_value_ = self.model.forward(torch.from_numpy(np.array([next_observation]).transpose(0, 3, 1, 2)).float().to(self.device))
+        _, critic_value = self.model.forward(torch.from_numpy(np.array([current_observation]).transpose(0, 3, 1, 2)).float().to(self.device))
+
         reward = torch.tensor(reward, dtype=torch.float).to(self.device)
-        advantage  = ((reward + self.gamma * critic_value_ * (1 - int(episode_complete))) - critic_value)
+        advantage = ((reward + self.gamma * critic_value_ * (1 - int(episode_complete))) - critic_value)
 
         # Combined loss
         actor_loss = -1 * self.log_probs * advantage
