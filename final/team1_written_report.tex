@@ -170,7 +170,7 @@ Unlike the Basic and REINFORCE policy gradient algorithms, the Proximal Policy O
 \subsection{Advantage Actor Critic}
 Actor-Critic methods, similar to the REINFORCE algorithm, learn both a policy function and state-value function.
 The main difference between them, however, is the fact that actor-critic methods use the value function as a way to bootstrap the value estimation.
-The implementation for this work follows closely to the "One-step Actor-Critic" algorithm outlined in \cite{ReinforcementLearningBook} with some practical updates for implementation.
+The implementation for this work follows closely to the "One-step Actor-Critic" algorithm outlined in \cite{ReinforcementLearningBook} with some practical updates for implementation and stands as a synchronous adaptation of the Asynchronous Advantage Actor critic algorithm (A3C) presented in \cite{mnih2016asynchronous}.
 It is a temporal difference algorithm that relies solely on the current step for learning.
 This is in contrast to the many of the other algorithms implemented in this work as they involve utilizing a replay buffer for batch learning.
 
@@ -476,17 +476,55 @@ SoftMax
 \section{Results} \label{results}
 
 \subsection{Continuous Advantage Actor Critic}
+The continuous actor critic agent was exercised using the MountainCarContinuous-v0 environment.
+This agent as implemented was able to obtain adequate scores in this game as well as meet the benchmark of 90 that is considered beating the game.
+This can be seen in the test reward plot in Figure \ref{fig:actorCriticGoodTestRewardMcc}.
+In this plot a scores near 80 are achieved for starting at episode 7000 with the highest score coming in at 91.06.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{best_actor_critic_mcc_test.png}}
+\caption{\textbf{The actor critic agent playing MountainCarContinuous-v0}  The actor critic agent successfully learns how to win the MountainCarContinuous-v0 environment.}
+\label{fig:actorCriticGoodTestRewardMcc}
+\end{figure}
+
+This environment was run multiple times with this same agent to confirm consistency of results.
+While this type of result was achieved consistently there were also runs that displayed some of the known issues with the stability of the actor critic method.
+Looking at the training plot from a run in Figure \ref{fig:actorCriticBadTrainingMcc},  it can be seen that the agent begins to learn, then ultimately fails to learn after 5000 episodes of training.
+
+This can be compared to the plot of a typical successful training of the agent as seen in Figure \ref{fig:actorCriticGoodTrainingMcc}.
+In this plot one can see a pronounced general upward trend in the learning which has essentially converged around 9000 episodes.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{bad_actor_critic_mcc.png}}
+\caption{\textbf{A bad training session for actor critic agent playing MountainCarContinuous-v0}  The actor critic method has stability issues that can affect training.}
+\label{fig:actorCriticBadTrainingMcc}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{best_actor_critic_mcc.png}}
+\caption{\textbf{A typical training session for actor critic agent playing MountainCarContinuous-v0}  A typical training session for the actor critic method.}
+\label{fig:actorCriticGoodTrainingMcc}
+\end{figure}
 
 \subsection{Discrete Advantage Actor Critic}
+The discrete advantage actor critic agent was trained and executed on the BreakoutNoFrameskip-v4 environment.
+Through this training we were unable to see significant learning taking place.
+The actor critic methods can be sensitive to hyperparameters such as learning rate so a hyperparameter search through multiple learning rates was performed though none of them seemed to affect the learning of the agent.
+A summary of these failed attempts can be seen in Figure \ref{fig:actorCriticLearningRateSearch}.
 
-\section{Planned Work} \label{planned}
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.4]{actor_critic_breakout_lr_search.png}}
+\caption{\textbf{A search through various learning rates for actor critic on Breakout.}  Changing the hyperparameter for learning rate did not improve the results for the discrete version of actor critic on the Breakout environment.}
+\label{fig:actorCriticLearningRateSearch}
+\end{figure}
+
+While better results were expected overall for this agent, its implementation lacked essentially all of the hallmark improvements made in \cite{DQNOriginalPaper} and \cite{NatureDeepLearning} such as usage of a target network and replay buffer.
+It is suspected that in a future work one may be able to make some of these adjustments such as use of a replay buffer and see improved results.
+
+This result was interesting as it showed an algorithm that performs well in a continuous action space environment did not translate well to one with discrete actions.
+One factor affecting this, however, may be the increased complexity of the game of Breakout compared to that of the mountain car problem.
 
 \section{Conclusion} \label{conclusion}
-Here, there should be an in-depth discussion about the way each model performed on each task and how those findings either agree or disagree with our expectations and hypotheses about the models, tasks, agents, and parameters.
-
-This project represents an approximate survey of diverse models from the Reinforcement Learning course, as well as the challenges and benefits of implementation of these methods on very different tasks. The project goal was effectively a combination of 6 models across 2 tasks, taking for 12 applications of a Project-3-like assignment. However, instead of simply doing 12 unique projects, this group wanted to emphasize the contrast in application between these different models on these different tasks.
-
-Among the time-expensive nature of training many agents on multiple tasks, our largest efforts were in the development of so many different models. These difficulties were effectively 6-8 project three development times, as we split the agent development among team members. In hindsight, in order to better address the goals of this project, we would make some changes to the experimental design and workflow of the project. Having a shared `agent\_runner` was a huge benefit, but instead of using that common core to develop many diverse agents, it is possible we could better address the goals of the experiment by using fewer models and more tasks. This change would give a better sense of the \_\_benchmarking\_\_ goal, as it would be interesting to compare some kind of human-performance normalized results of a handful of agents (DQN, policy gradient,) on many tasks, such as every atari game. As it stands, the deployment of more agents is an interesting comparison on a small number of tasks, but most of our resources went into the development of these diverse agents, as opposed to truly optimizing and benchmarking them. Another option to ameliorate these difficulties would be to rely only on other researcher's implementations of these algorithms, so that our group could focus on applying them and getting as many results as possible, instead of troubleshooting and programming.
 
 \bibliography{citations.bib}{}
 \bibliographystyle{plain}
