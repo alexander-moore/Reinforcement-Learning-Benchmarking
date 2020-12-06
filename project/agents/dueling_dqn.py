@@ -134,7 +134,7 @@ class SampleAgent(Agent):
         #expected_Q = rewards.squeeze(1) + self.gamma * max_next_Q
 
         loss = torch.nn.functional.mse_loss(curr_Q, expected_Q)
-        self.optimizer.zero_grad()
+        #self.optimizer.zero_grad()
         loss.backward()
 
         # Update parameters
