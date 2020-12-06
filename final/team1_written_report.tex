@@ -178,9 +178,83 @@ In addition, it should be noted that this implementation remains a basic impleme
 
 \section{Methodology} \label{methodology}
 
-\subsection{Tools and Environment}
-This project was implemented using the Python language and relied heavily on the openai gym packages.
-In addition, the code from Project 3 was adapted to serve as a baseline for interacting with the gym environments described next.
+\subsection{Tools and Framework}
+This project used the Python language and several python libraries. 
+In addition to the standard libraries, the following additional libraries were used:
+ 
+\begin{itemize}
+    \item OpenAI Gym \cite{openaigym}
+    \item PyTorch
+    \item NumPy
+    \item Matplotlib
+    \item Pandas
+\end{itemize}
+
+The framework provided from Project 3 was built off of and adapted to support additional environments aside from Breakout.
+A framework was built such that the main training and testing pipeline was consistent across algorithm implementations.
+This allowed for each team member to focus on implementing specific models and algorithm learning details.
+
+The general workflow using this framework can be seen in Listing \ref{listing:basicModelWorkflow}.
+
+\begin{lstlisting}[
+    float=t,
+    caption=\textbf{Algorithm Development Workflow} The basic workflow used to develop new models and algorithms.,
+    label=listing:basicModelWorkflow,
+]
+
+# Create a new model in models directory
+# - Implement the __init__ function
+# - Implement the forward function
+
+# Create a new agent in the agents directory
+# - Implement the make_action function
+# - Implement the can_train function
+# - Implement the train function
+
+# Execute training for model on command line
+# python main.py \
+#    --train_dqn \
+#    --model sample_model.SampleModel \
+#    --agent sample_agent.SampleAgent \
+#    --other_arguments
+
+\end{lstlisting}
+
+It should be noted that all agents inherit a set of functions from a base class allowing for a small barrier to entry in setting up new agents.
+An agent runner class was constructed such that it handles the main training loop used by all algorithms implemented while the learning details are held within the specific agents themselves.
+
+In addition, during model training, this framework stores all arguments used to start the session as well as periodic interim models and statistics in both raw format and as plots.
+This allowed for repeatability and easy metrics collection during every session.
+An example view of what this archive directory looks like can be seen in Listing \ref{listing:sampleModelArchive}.
+
+\begin{lstlisting}[
+    float=t,
+    caption=\textbf{Model Training Archive} A typical archive from a model that has been trained for 2000 episodes.,
+    label=listing:sampleModelArchive,
+]
+
+archive/
+   |
+   test_learning_rate/
+       |
+       args.pkl
+       1000_model.pth
+       1000_optimizer.pth
+       1000_training_metrics.csv
+       1000_training_reward_plot.png
+       1000_test_metrics.csv
+       1000_test_reward_plot.png
+       2000_model.pth
+       2000_optimizer.pth
+       2000_training_metrics.csv
+       2000_training_reward_plot.png
+       2000_test_metrics.csv
+       2000_test_reward_plot.png
+\end{lstlisting}
+
+\subsection{Gym Environments}
+Several different environments from the openai gym python packages were utilized on this project.
+A description of each of these environments and a description of the task to be solved by agents within them follows.
 
 \subsubsection{BreakoutNoFrameskip-v4}
 The Breakout environment involves interacting with the Atari 2600 game by the agent receiving image data for what has been seen on screen.
@@ -236,8 +310,174 @@ The reward structure for this environment consists of -1 for each time step unti
 The environment is considered solved if an average of -110 points is achieved over 100 consecutive trials \footnote{https://github.com/openai/gym/wiki/MountainCar-v0}.
 
 \subsection{Continuous Action Spaces}
+One of the key goals for this project was to interact in an environment with continuous action spaces.
+In general, models that operate in discrete action spaces take as input the state space (or state-space and action) and return either a value function or policy function.
+The value function represents the value of the particular state and the policy function generally provides an action or probabilities for which actions to execute.
+
+When dealing with continuous action spaces, this is shifted such that the policy learned is the mean and standard deviation for desirable actions within a continuous action space.
+As the agent learns, the standard deviation generally starts out wide and then narrows once it is more confident in the actions to take.
+Choosing an action consists of sampling from the learned distribution.
+
+\subsection{Continuous Advantage Actor Critic Implementation}
+The actor critic implementation follows closely to the "One-step Actor-Critic" algorithm outlined in \cite{ReinforcementLearningBook} with some practical updates made for implementation adapted from Phil Tabor's public codebase \footnote{https://github.com/philtabor}.
+This implementation is a temporal difference algorithm using no replay buffer and using only the current time step information to facilitate learning.
+In addition, it is implemented in an on-policy manner.
+
+The target for this model was the MountainCarContinuous-v0 environment so the model and agent were structured with this in mind.
+One can see the model structure and hyperparameters of the final model in Listing \ref{listing:continuousActorCriticModel} and Table \ref{table:continuousActorCriticHypers} respectively.
+
+
+\begin{lstlisting}[
+  float=t,
+  caption=\textbf{Continuous Actor Critic Model}  The model architecture used for the continuous actor critic implementation.,
+  label=listing:continuousActorCriticModel,
+]
+Fully Connected:   2 Input,512 Output
+ReLU
+
+|
+v
+
+Fully Connected:  512 Input, 512 Output  
+ReLU
+
+|\
+| \
+|  \
+|   |
+|   v
+|  Value Output Layer:  512 Input; 1 Output
+|
+v
+
+Policy Mean 
+Output Layer:   512 Input;  1 Output
+tanh
+
+Policy Standard Deviation 
+Output Layer:  512 Input;  1 Output
+Softplus
+\end{lstlisting}
+
+\begin{table}[htbp]
+    \caption{\textbf{Continuous Advantage Actor Critic Hyperparameters}  The hyperparameters used for training the continuous actor critic agent.}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\
+\hline
+\textbf{Batch Size} & Does not apply \\
+\hline
+\textbf{Learning Rate} & 0.00015 \\
+\hline
+\textbf{Replay Buffer Size} & Does not apply \\
+\hline
+\textbf{Minimum Buffer Training Size} & Does not apply \\
+\hline
+\textbf{Starting Epsilon} & Does not apply \\
+\hline
+\textbf{Final Epsilon} & Does not apply \\
+\hline
+\textbf{Epsilon Decay Steps} & Does not apply \\
+\hline
+\textbf{Gamma} & 0.99\\
+\hline
+\textbf{Loss Function} &  -log\_loss * advantage \\
+\hline
+\textbf{Optimizer} & Adam \\
+\hline
+\textbf{Target Network Update Interval} & Does not apply \\
+\hline
+\end{tabular}
+\label{table:continuousActorCriticHypers}
+\end{center}
+\end{table}
+
+
+\subsection{Discrete Advantage Actor Critic Implementation}
+The discrete version of the actor critic algorithm adapted the continuous version discussed earlier for the BreakoutNoFrameskip-v4 environment.
+This included incorporating a known model baseline previously shown effective in this environment while adapting it for returning both the policy and values necessary for the actor critic method.
+
+The model structure and hyperparameters for this implementation can be seen in Listing \ref{listing:discreteActorCriticModel} and Table \ref{table:discreteActorCriticHypers} respectively.
+
+\begin{lstlisting}[
+  float=t,
+  caption=\textbf{Discrete Actor Critic Model}  The model architecture used for the discrete actor critic implementation.,
+  label=listing:discreteActorCriticModel,
+]
+CNN:  32 8x8 filters, stride 4
+ReLU
+
+|
+v
+
+CNN:  64 4x4 filters, stride 2
+ReLU
+
+|
+v
+
+CNN:  64 3x3 filters, stride 1
+ReLU
+
+|
+v
+
+Fully Connected: 3136 Input; 512 Output
+ReLU
+
+|\
+| \
+|  \
+|   |
+|   v
+|  Value Output Layer:  512 Input; 1 Output
+|
+v
+
+Policy Output Layer: 512 Input;  4 Output
+SoftMax
+\end{lstlisting}
+
+\begin{table}[htbp]
+    \caption{\textbf{Discrete Advantage Actor Critic Hyperparameters}  The hyperparameters used for training the discrete actor critic agent.}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\
+\hline
+\textbf{Batch Size} & Does not apply \\
+\hline
+\textbf{Learning Rate} & 0.0003\\
+\hline
+\textbf{Replay Buffer Size} & Does not apply \\
+\hline
+\textbf{Minimum Buffer Training Size} & Does not apply \\
+\hline
+\textbf{Starting Epsilon} & Does not apply \\
+\hline
+\textbf{Final Epsilon} & Does not apply \\
+\hline
+\textbf{Epsilon Decay Steps} & Does not apply \\
+\hline
+\textbf{Gamma} & 0.99\\
+\hline
+\textbf{Loss Function} &  -log\_loss * advantage \\
+\hline
+\textbf{Optimizer} & Adam \\
+\hline
+\textbf{Target Network Update Interval} & Does not apply \\
+\hline
+\end{tabular}
+\label{table:discreteActorCriticHypers}
+\end{center}
+\end{table}
 
 \section{Results} \label{results}
+
+\subsection{Continuous Advantage Actor Critic}
+
+\subsection{Discrete Advantage Actor Critic}
 
 \section{Planned Work} \label{planned}
 
@@ -246,12 +486,6 @@ Research is planned to be performed to understand all of the techniques to be ex
 In addition, the literature will be surveyed to identify any recent developments or improvements related to the methods being employed.
 While doing this, we also plan to obtain available benchmarks for techniques such as those found in \cite{DQNOriginalPaper, NatureDeepLearning, bhonker2017playing}.
 To keep experiments fair to models and reduce compute time, we will find hyperparameter suggestions by model authors where available, but not directly tune one model's hyperparameters for a single game task. Rather, heuristics will be used in their place to attempt to simultaneously generalize models across tasks while keeping experimental design relatively fair.
-
-\subsection{Environment Setup}
-This part of the project involves ensuring that all team members have the ability to develop and assess the algorithms under study.
-Some of the key areas include ensuring a common (or compatible) software environment is available including the ability to run \cite{nichol2018retro} either locally or on a WPI asset such as the Ace cluster.
-In addition, a simple framework or skeleton code should be utilized such that all algorithm implementations are structurally similar.
-We plan to take advantage of the provided framework from Project 3 to reduce the amount of work necessary in this area.
 
 \subsection{Algorithm Implementations}
 The algorithm implementations involve taking the actual theoretical algorithms and implementing them in Python code using common libraries such as PyTorch and NumPy.
@@ -265,9 +499,6 @@ We will incorporate our knowledge from researching capabilities of the models as
 
 \subsection{Work Completed}
 
-Our largest contribution to the final deliverable so far is the development of an agent-game pair running file, in which the researcher inputs arguments into the terminal corresponding to the model and task they would like to dispatch for training. This means all of our model implementations must be written such that they are indifferent to different environment types, state shapes, model attributes, or other quirks arising in agent training. This means that all agents must inherit from a superclass of a general agent framework, and particularities in training (such as the difference between training on state-action-reward tuples, episodes, or tuples of episodes must be addressed in one execution of the model's unique 'train()' function, which is called in the general 'agent\_runner' executed file.
-At the testing time determined by the 'agent\_runner' call, this same process occurs though in a simpler fashion where the generic 'agent.make\_action' refers to a trained policy and state-value function to play the game it was trained on.
-The development of this general dispatcher will serve two primary purposes for the remaining work of the project. First, this shared dispatcher file will assure consistent running of each model, where changes can be made to environments and shared parameters without needing to rely on manual changes to many ($num\_tasks*num\_agents$) files. Second, this greatly expedites batch computation when training models on cluster computers, as we can serialize calls for any number of agents, games, and hyperparameters as we see necessary.
 
 So far, we have draft versions of the following algorithms:
 \begin{enumerate}
@@ -300,18 +531,6 @@ If any work is found to be an interesting demo it would be displayed during the 
 \section{Tools and Environment}
 
 \subsection{Implementation Language}
-This project will be using the Python language of at least version 3.7.
-In addition to the standard libraries, it is expected that the following additional libraries will be utilized and standardized across group development machines:
- 
-\begin{itemize}
-    \item Gym Retro \cite{nichol2018retro}
-    \item PyTorch
-    \item NumPy
-    \item Matplotlib
-    \item Pandas
-\end{itemize}
-
-In addition, the framework from Project 3 will be utilized as a baseline for implementing the various algorithms being researched. Each algorithm can be fit in this framework to facilitate plug-and-train pipelines for each different model and game.
 
 \subsection{Reinforcement Learning Environment}
 This project plans to use an existing reinforcement learning environment while assessing the various algorithm implementations.
@@ -329,7 +548,7 @@ These games represent diversity in action spaces, reward sparsity, action-memory
 The plan for compute resources is to use a combination of local machines as well as the Ace cluster at WPI.
 Several team members have access to personal machines with GPUs while other team members have access to the Ace cluster.
 These resources combined should provide sufficient computing resources to be successful on this project.
-Dispatching batches of jobs can also expedite and parallelize long training times. Compute resources were a limiting factor for the developement of this project, as each of the agent-model-task combinations must be trained independently and for each combination of hyperparameters. Since project 3 took many weeks to optimize just a single agent-task combination with some parameter set, optimizing up to 12 experiments would be intractable, as though there is some carryover between parameter choices between similar agents on the same task, these parameters do not carry over between tasks, and there is a massive space of parameters to explore, particularly when agents include their own unique parameter options. The implementation of such arguments alone is a large task to handle over multiple tasks.
+Dispatching batches of jobs can also expedite and parallelize long training times. Compute resources were a limiting factor for the development of this project, as each of the agent-model-task combinations must be trained independently and for each combination of hyperparameters. Since project 3 took many weeks to optimize just a single agent-task combination with some parameter set, optimizing up to 12 experiments would be intractable, as though there is some carryover between parameter choices between similar agents on the same task, these parameters do not carry over between tasks, and there is a massive space of parameters to explore, particularly when agents include their own unique parameter options. The implementation of such arguments alone is a large task to handle over multiple tasks.
 
 \section{Final Deliverables} \label{deliverables}
 
@@ -353,7 +572,7 @@ Here, there should be an in-depth discussion about the way each model performed 
 
 This project represents an approximate survey of diverse models from the Reinforcement Learning course, as well as the challenges and benefits of implementation of these methods on very different tasks. The project goal was effectively a combination of 6 models across 2 tasks, taking for 12 applications of a Project-3-like assignment. However, instead of simply doing 12 unique projects, this group wanted to emphasize the contrast in application between these different models on these different tasks.
 
-Among the time-expensive nature of training many agents on multiple tasks, our largest efforts were in the developement of so many different models. These difficulties were effectively 6-8 project three developement times, as we split the agent developement among team members. In hindsight, in order to better address the goals of this project, we would make some changes to the experimental design and workflow of the project. Having a shared `agent_runner` was a huge benefit, but instead of using that common core to develop many diverse agents, it is possible we could better address the goals of the experiment by using fewer models and more tasks. This change would give a better sense of the __benchmarking__ goal, as it would be interesting to compare some kind of human-performance normalized results of a handful of agents (DQN, policy gradient,) on many tasks, such as every atari game. As it stands, the deployment of more agents is an interesting comparison on a small number of tasks, but most of our resources went into the developement of these diverse agents, as opposed to truly optimizing and benchmarking them. Another option to ameliorate these difficulties would be to rely only on other researcher's implementations of these algorithms, so that our group could focus on applying them and getting as many results as possible, instead of troubleshooting and programming.
+Among the time-expensive nature of training many agents on multiple tasks, our largest efforts were in the development of so many different models. These difficulties were effectively 6-8 project three development times, as we split the agent development among team members. In hindsight, in order to better address the goals of this project, we would make some changes to the experimental design and workflow of the project. Having a shared `agent\_runner` was a huge benefit, but instead of using that common core to develop many diverse agents, it is possible we could better address the goals of the experiment by using fewer models and more tasks. This change would give a better sense of the \_\_benchmarking\_\_ goal, as it would be interesting to compare some kind of human-performance normalized results of a handful of agents (DQN, policy gradient,) on many tasks, such as every atari game. As it stands, the deployment of more agents is an interesting comparison on a small number of tasks, but most of our resources went into the development of these diverse agents, as opposed to truly optimizing and benchmarking them. Another option to ameliorate these difficulties would be to rely only on other researcher's implementations of these algorithms, so that our group could focus on applying them and getting as many results as possible, instead of troubleshooting and programming.
 
 \bibliography{citations.bib}{}
 \bibliographystyle{plain}
