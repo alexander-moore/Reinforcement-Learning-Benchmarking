@@ -25,7 +25,7 @@
 
 \begin{document}
 
-\title{CS525 - Team 1 Project 4 Progress Report}
+\title{Benchmarking Agents Across Diverse Tasks}
 
 \author{
 \IEEEauthorblockN{Alexander Moore}
@@ -72,35 +72,38 @@ stang3@wpi.edu}
 \begin{abstract}
     Understanding which models succeed (and why) at which tasks is a foundational experience in reinforcement learning.
     Following a baseline of techniques and best practices found in the literature this project will show a comparison of multiple reinforcement learning techniques applied in a few common environments.
-    In particular, the aim of this project is to implement several Q-learning and policy learning algorithms and compare the results across diverse tasks.
-    In addition, the results attained by this work will be analyzed with respect to the expected outcomes of each algorithm on each task.
-    This work will serve as an exploration of baseline results for diverse reinforcement learning algorithms, in order to compare and contrast the performance of models on diverse tasks.
-    Potential conclusions of this work could include suggestions for appropriate models given the task, heuristic hyperparameters which work for many models, and potential evidence that some models always outperform others, though we expect models to succeed and fail based on the inductive biases their structures assume.
+    In particular, this project implements several algorithms under the Q-learning, policy learning, and actor-critic categories and compares the results across several tasks.
+    It is shown where these algorithms work strongly on some tasks and perform poorly on others.
+    This work explores a set of baseline results for diverse reinforcement learning algorithms, in order to compare and contrast the performance of models on diverse tasks.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Q-Learning, Policy Learning, DQN, Policy Gradient, Reinforcement Learning
+Q-Learning, Policy Learning, DQN, Policy Gradient, actor-critic, Reinforcement Learning
 \end{IEEEkeywords}
 
 \section{Introduction}
 Project 3 explored how to construct a Deep Q Network (DQN) by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
-Building off of this recent experience this project proposes that deep learning techniques applied to the area of policy learning are implemented and compared to the results of DQNs.
+Building off of this recent experience this project takes the deep learning techniques discussed in class and applies them to several well-known tasks using Q-learning, policy learning, and actor-critic methods.
+The results of these methods are compared and discussed.
 
-In addition, this project proposes to use the Breakout screen capture game as a baseline for the environment and games to use for comparison of techniques as it is considered more difficult than the Atari 2600 games contained in the Arcade Learning Environment \cite{Bellemare_2013, DQNOriginalPaper}. The results on this discrete action-space game will be contrasted to the results of training our set of models on the continuous action space game Box2D BipedalWalker-v2 \footnote{https://gym.openai.com/envs/\#box2d}. Though all of our models can be applied to both discrete and continuous action games, we expect very different results and ideally will find that no one model outperforms all others across both tasks. Time permitting, we can add additional tasks which differ from the previous two games, to refine our sense of why some models would outperform others given the context of the experiment.
-Using this environment multiple agents will be trained using policy learning techniques such as vanilla policy gradient, proximal policy optimization (PPO), Monte Carlo policy gradient, with the final cast of models and hyperparameters selected based on compute-time available.
+The openai gym \footnote{https://gym.openai.com/} was chosen to be used as the game environment.
+Two games were chosen to be used for comparison of the algorithms in this paper.
+First, the Breakout game was used for its familiarity from Project 3 and that it has a known level of difficulty.
+In addition, it serves as a discrete action space environment.
+To contrast with this, the MountainCar was also chosen as it has both a discrete and continuous action space environment available for use.
+Using these environments multiple agents were trained and tested using DQN, Double DQN, Dueling DQN, REINFORCE, Proximal Policy Optimization (PPO), and Advantage Actor Critic (A2C).
+This work shows that these algorithms all have strengths and weaknesses in a wide variety of areas including task completion, complexity, training time, and sensitivity to hyperparameters.
 
-The results of these agents will then be compared to trained Q-learning agents implemented as a DQN, Double DQN, and Dueling DQN; while using the results to assess the strengths and weaknesses of each. By comparing multiple agents across multiple games we will create a case for the superiority or inferiority of some algorithms to others by finding or disproving that there is no one algorithm which consistently outperforms others.
-
-The remainder of this progress report is as follows:
+The remainder of this paper is organized as follows:
 \begin{itemize}
-\item Section \ref{background} provides background information regarding the methods planned to be implemented.
-\item Section \ref{planned} outlines the specific work done and remaining to be done for this project.
-\item Section \ref{deliverables} indicates the expected deliverables to be generated and provided as part of this work.
-\item Finally, the proposal concludes in section \ref{conclusion}.
+\item Section \ref{background} provides background information regarding the methods implemented.
+\item Section \ref{methodology} provides a description of the methodology used to train, execute, and assess the algorithms explored.
+\item Section \ref{results} provides a discussion of the training process and associated results.
+\item Finally, the paper concludes in section \ref{conclusion}.
 \end{itemize}
 
 \section{Background Information} \label{background}
-Our goals may change for implementation. For example, we may focus on a smaller amount of models and instead compare tweaks on these algorithms to demonstrate and quantify the improvement they offer.
+
 \subsection{Deep Q Learning}
 Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For some of our environments this will be a convolution over a screen space, and for some we might extract some derived features about the game for the model to use as a state representation.
 
@@ -124,6 +127,7 @@ $$\theta = \theta  + \eta \nabla \bar{R}_{\theta}$$
 where N is the number of episodes, T is the steps within an episode, R is the reward for a given episode, $\theta$ are the policy parameters, a is a given action, and s is a given state.
 
 Implemented in pseudocode, this algorithm would be similar to Listing \ref{listing:basicPolicyGradientAlg}.
+While not implemented as part of this project is is the building block for all subsequently developed policy gradient models.
 
 \begin{lstlisting}[
     float=t,
@@ -142,9 +146,7 @@ Loop until stopping criteria met:
 
 \subsection{REINFORCE Policy Gradient}
 The REINFORCE Policy Gradient method also referred to as Monte-Carlo Policy Gradient makes a slight adjustment to the Basic Policy Gradient algorithm of using the return from each time step instead of the overall reward from the episode in the update of the policy parameters. This will reduce the high variance of the standard basic policy gradient algorithm.
-This change can be seen in the pseudocode below:
-
-Listing \ref{listing:reinforcePolicyGradientAlg}.
+This change can be seen in the pseudocode in Listing \ref{listing:reinforcePolicyGradientAlg}. 
 
 \begin{lstlisting}[
     float=h,
@@ -164,6 +166,78 @@ return {$\theta$}
 
 \subsection{PPO Policy Gradient}
 Unlike the Basic and REINFORCE policy gradient algorithms, the Proximal Policy Optimization (PPO) algorithm is an off-policy method, where the performance assessment and improvement of a policy is different than the one used for action selection (or sampling). The separate policies allow the collected data to be used more than once, which result in faster performance. PPO also addresses other shortcomings of the Basic Policy Gradient by subtracting the state-value off as the baseline to improve update accuracy when rewards are non-negative via an Advantage function. This function also serves to reduce large variance without increasing bias. Finally, PPO improves stability by imposing a constraint on the distance (or difference) between the old and new policies by clipping their ratio to a small interval around one.
+
+\subsection{Advantage Actor Critic}
+Actor-Critic methods, similar to the REINFORCE algorithm, learn both a policy function and state-value function.
+The main difference between them, however, is the fact that actor-critic methods use the value function as a way to bootstrap the value estimation.
+The implementation for this work follows closely to the "One-step Actor-Critic" algorithm outlined in \cite{ReinforcementLearningBook} with some practical updates for implementation.
+It is a temporal difference algorithm that relies solely on the current step for learning.
+This is in contrast to the many of the other algorithms implemented in this work as they involve utilizing a replay buffer for batch learning.
+
+In addition, it should be noted that this implementation remains a basic implementation and does not include the commonly seen updates added to this method such as an additional entropy loss.
+
+\section{Methodology} \label{methodology}
+
+\subsection{Tools and Environment}
+This project was implemented using the Python language and relied heavily on the openai gym packages.
+In addition, the code from Project 3 was adapted to serve as a baseline for interacting with the gym environments described next.
+
+\subsubsection{BreakoutNoFrameskip-v4}
+The Breakout environment involves interacting with the Atari 2600 game by the agent receiving image data for what has been seen on screen.
+After pre-processing handled by the atari wrapper code the state space consists of 4 stacked 84x84 images.
+The action space for this environment consists of 4 possible discrete actions:
+
+\begin{itemize}
+    \item LEFT - Move agent left
+    \item RIGHT - Move agent right
+    \item NOOP - Do nothing
+    \item FIRE - Places ball in motion at start of new lives
+\end{itemize}
+
+This environment was chosen as it was familiar from Project 3 and sufficiently difficult for naive models.
+In addition, it serves as a well-contained discrete action space for all algorithms under test.
+
+The reward structure for this environment consists of the traditional values for the blocks in the game where the first two levels provide one point, the next two levels provide 3 points, and the final two levels provide 7 points.
+For the learning agent, the atari wrapper environment clips this reward to be just one point for a timestep where a brick was broken.
+
+\subsubsection{MountainCarContinuous-v0}
+The Mountain Car environment in both its original and continuous form consists of the agent being a car beginning in the valley between two mountains.
+In this classic control task, the agent must apply a specific force to the mountain car with the goal of reaching the top of the right hand mountain as seen by the flag in Figure \ref{fig:mountainCarEnvironment}.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{mountain_car.png}}
+\caption{\textbf{Example of the Mountain Car Environment}  The mountain car environment provided by openai.}
+\label{fig:mountainCarEnvironment}
+\end{figure}
+
+In this environment, the agent must learn to gather enough momentum by first going backwards a bit prior to going forwards in order to have enough acceleration to reach the flag.
+
+The state space for this environment consists only of the mountain car's position and velocity.
+The action space for this environment is a single continuous action which is the force to be applied to the mountain car.
+A positive value is a force towards the goal and a negative value for this force puts the mountain car in reverse.
+
+The reward structure for this environment consists of the agent receiving a small negative reward for the number of actions taken and a positive reward of 100 when reaching the goal.
+This environment is considered solved once a score of 90 is achieved \footnote{https://github.com/openai/gym/wiki/MountainCarContinuous-v0}.
+
+This environment was chosen as it is a well-suited introductory environment to explore continuous action spaces.
+
+\subsubsection{MountainCar-v0}
+The MountainCar-v0 environment is the discrete action-space relative of MountainCarContinuous-v0 as described above.
+This environment entails the same general principles and overall goal but the action space has been altered to use discrete actions as listed below.
+
+\begin{itemize}
+    \item PUSH LEFT
+    \item PUSH RIGHT
+    \item NO PUSH
+\end{itemize}
+
+The state-space for this environment remains unchanged.
+The reward structure for this environment consists of -1 for each time step until the goal is reached.
+The environment is considered solved if an average of -110 points is achieved over 100 consecutive trials \footnote{https://github.com/openai/gym/wiki/MountainCar-v0}.
+
+\subsection{Continuous Action Spaces}
+
+\section{Results} \label{results}
 
 \section{Planned Work} \label{planned}
 
@@ -257,7 +331,7 @@ Several team members have access to personal machines with GPUs while other team
 These resources combined should provide sufficient computing resources to be successful on this project.
 Dispatching batches of jobs can also expedite and parallelize long training times. Compute resources were a limiting factor for the developement of this project, as each of the agent-model-task combinations must be trained independently and for each combination of hyperparameters. Since project 3 took many weeks to optimize just a single agent-task combination with some parameter set, optimizing up to 12 experiments would be intractable, as though there is some carryover between parameter choices between similar agents on the same task, these parameters do not carry over between tasks, and there is a massive space of parameters to explore, particularly when agents include their own unique parameter options. The implementation of such arguments alone is a large task to handle over multiple tasks.
 
-\section{Final Deliverables}
+\section{Final Deliverables} \label{deliverables}
 
 \subsection{Final Report}
 The final report provided as part of this project will include the necessary background information required to understand the methods used.
