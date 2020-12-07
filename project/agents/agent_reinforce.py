@@ -158,7 +158,6 @@ class REINFORCE(Agent):
         self.buffer.clear()
 
         # Return loss
-        print(loss.detach().item())
         return loss.detach().item()
 
     def calculate_log_prob(self, state, action):
