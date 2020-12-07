@@ -150,7 +150,6 @@ class REINFORCE(Agent):
         self.optimizer.step()
 
 
-
         # Clear buffer
         self.buffer.clear()
         self.log_probs = []
