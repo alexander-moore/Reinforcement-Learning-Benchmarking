@@ -93,7 +93,7 @@ First, the Breakout game was used for its familiarity from Project 3 and that it
 In addition, it serves as a discrete action space environment. The Breakout-v0 game is a productive demonstration as part of the poster presentation since the students in the class are all familiar with the process of implementing, optimizing, and testing a DQN-family model on the game. This will contextualize both the work of the project as well as expected score results, for example 50 for a baseline and 400 for the best-scorers in the course.\footnote{https://github.com/yingxue-zhang/DS595CS525-RL-Projects/tree/master/Project3}
 To contrast with this, the MountainCar was also chosen as it has both a discrete and continuous action space environment available for use.
 Using these environments multiple agents were implemented, trained, and tested using DQN, Double DQN, Dueling DQN, REINFORCE, Proximal Policy Optimization (PPO), and Advantage Actor Critic (A2C).
-This work shows that these algorithms all have strengths and weaknesses in a wide variety of areas including task completion, complexity, training time, and sensitivity to hyperparameters. Ultimately, the success of models is left largely to the hyperparameter selection and tuning step.
+This work shows that these algorithms all have strengths and weaknesses in a wide variety of areas including task completion, complexity, training time, and sensitivity to hyperparameters. Ultimately, the success of models is left largely to the hyperparameter selection and tuning steps.
 
 The remainder of this paper is organized as follows:
 \begin{itemize}
@@ -107,13 +107,29 @@ The remainder of this paper is organized as follows:
 \section{Environments} \label{envs}
 
 \subsection{Breakout-v0}
+Breakout was introduced to all members of the Reinforcement Learning class as part of Project 3. This task is an Atari game environment provided by the OpenAI Gym package. The game takes a discrete-action input of the paddle direction and returns a state, a stack of 4 frames of pixels corresponding to the 4 most recent game screens.
+
+We selected this game because of its familiarity to all members of the class, as they all know the challenges and process of model and agent implementation, parameter tuning, and likely have read the paper introducing the task for DQN. They are also familiar with the level of work and training to get a model to the 50-point threshold, as well as the best models in the course getting a score up to 400 points. The reward in Breakout is given by the Atari game itself, as the goal is to destroy as many blocks as possible before allowing the ball to pass the deflector.
+
+\begin{figure}
+\includegraphics[]{atari.jpg}
+\end{figure}
 
 \subsection{MountainCar-v0}
+MountainCar was our second selected environment to complement the game Breakout, which we knew we would use. MountainCar is a simple game setup where a small car must build up momentum by accelerating up alternating slopes in order to reach a goal height. The agent selects either a 3-element discrete action (accelerate left, right, or none), or in the continuous version of the game selects from a continuum of directional accelerations. MountainCar returns a reward depending on the time taken by the agent to reach the goal height.
+
+\begin{figure}
+\includegraphics[]{car.jpg}
+\end{figure}
+
+This game is significantly smaller than the breakout game in terms of state size, as well as being significantly easier to solve, as the optimal strategy is significantly less complex than the space of Breakout strategies. We expect the training process of this game to be significantly faster than Breakout, letting us train greater numbers of agents and optimize the hyperparameters of these agent significantly more than in the Breakout setting, where even using WPI computation clusters the training can take days.
 
 \section{Background Information} \label{background}
 
 \subsection{Deep Q Learning}
-Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For our Breakout environment this will be a convolution over a stack screen space samples, and for Mountaincar the state is only two values: the car position and car velocity.
+Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For our Breakout environment this will be a convolution over a stack screen space samples, and for Mountaincar the model is a simple fully-connected network over the state game state: the car position and car velocity.
+
+Deep Q Learning is trained by minimizing the loss taken by evaluating the Q(s,a) value between the agent's state-value function and a target Q function, which is not optimized but occasionally updated to keep the training Q learning.
 
 \subsection{Double Deep Q Learning}
 Double deep Q networks address the maximization bias problem from Deep q learning by instead letting two Q functions randomly select the action and update the corresponding Q function. This process inhibits bias and will potentially converge faster or outright outperform DQN on all tasks.
