@@ -70,48 +70,74 @@ stang3@wpi.edu}
 \maketitle
 
 \begin{abstract}
-    Understanding which models succeed (and why) at which tasks is a foundational experience in reinforcement learning.
+    Understanding which models succeed and why at which tasks is a foundational experience in reinforcement learning.
     Following a baseline of techniques and best practices found in the literature this project will show a comparison of multiple reinforcement learning techniques applied in a few common environments.
     In particular, this project implements several algorithms under the Q-learning, policy learning, and actor-critic categories and compares the results across several tasks.
-    It is shown where these algorithms work strongly on some tasks and perform poorly on others.
+    We demonstrate the strengths and weaknesses of a large sample of models on discrete-action and continuous action tasks.
     This work explores a set of baseline results for diverse reinforcement learning algorithms, in order to compare and contrast the performance of models on diverse tasks.
+    Results sentence here.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Q-Learning, Policy Learning, DQN, Policy Gradient, actor-critic, Reinforcement Learning
+Q-Learning, Policy Learning, Policy Gradient, Actor-Critic, Reinforcement Learning
 \end{IEEEkeywords}
 
 \section{Introduction}
-Project 3 explored how to construct a Deep Q Network (DQN) by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
-Building off of this recent experience this project takes the deep learning techniques discussed in class and applies them to several well-known tasks using Q-learning, policy learning, and actor-critic methods.
+Project 3 explored how to construct a Deep Q Network (DQN) or a similar model by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
+Building off of this recent experience this project takes the deep learning techniques discussed in class and applies them to several well-known tasks using Q-learning, policy learning, and actor-critic methods. Our group implemented, optimized, and benchmarked a large variety of models from these diverse families in order to analyze and discuss the success and failures of each model. We quantify model success by comparing the scores achieved as well as the time-to-convergence in terms of training episodes needed to reach a threshold score.
 The results of these methods are compared and discussed.
 
 The openai gym \footnote{https://gym.openai.com/} was chosen to be used as the game environment.
 Two games were chosen to be used for comparison of the algorithms in this paper.
 First, the Breakout game was used for its familiarity from Project 3 and that it has a known level of difficulty.
-In addition, it serves as a discrete action space environment.
+In addition, it serves as a discrete action space environment. The Breakout-v0 game is a productive demonstration as part of the poster presentation since the students in the class are all familiar with the process of implementing, optimizing, and testing a DQN-family model on the game. This will contextualize both the work of the project as well as expected score results, for example 50 for a baseline and 400 for the best-scorers in the course.\footnote{https://github.com/yingxue-zhang/DS595CS525-RL-Projects/tree/master/Project3}
 To contrast with this, the MountainCar was also chosen as it has both a discrete and continuous action space environment available for use.
-Using these environments multiple agents were trained and tested using DQN, Double DQN, Dueling DQN, REINFORCE, Proximal Policy Optimization (PPO), and Advantage Actor Critic (A2C).
-This work shows that these algorithms all have strengths and weaknesses in a wide variety of areas including task completion, complexity, training time, and sensitivity to hyperparameters.
+Using these environments multiple agents were implemented, trained, and tested using DQN, Double DQN, Dueling DQN, REINFORCE, Proximal Policy Optimization (PPO), and Advantage Actor Critic (A2C).
+This work shows that these algorithms all have strengths and weaknesses in a wide variety of areas including task completion, complexity, training time, and sensitivity to hyperparameters. Ultimately, the success of models is left largely to the hyperparameter selection and tuning steps.
 
 The remainder of this paper is organized as follows:
 \begin{itemize}
+\item Section \ref{envs} lists our considered and selected environments, with a brief description and motivation for each.
 \item Section \ref{background} provides background information regarding the methods implemented.
 \item Section \ref{methodology} provides a description of the methodology used to train, execute, and assess the algorithms explored.
 \item Section \ref{results} provides a discussion of the training process and associated results.
 \item Finally, the paper concludes in section \ref{conclusion}.
 \end{itemize}
 
+\section{Environments} \label{envs}
+
+\subsection{Breakout-v0}
+Breakout was introduced to all members of the Reinforcement Learning class as part of Project 3. This task is an Atari game environment provided by the OpenAI Gym package. The game takes a discrete-action input of the paddle direction and returns a state, a stack of 4 frames of pixels corresponding to the 4 most recent game screens.
+
+We selected this game because of its familiarity to all members of the class, as they all know the challenges and process of model and agent implementation, parameter tuning, and likely have read the paper introducing the task for DQN. They are also familiar with the level of work and training to get a model to the 50-point threshold, as well as the best models in the course getting a score up to 400 points. The reward in Breakout is given by the Atari game itself, as the goal is to destroy as many blocks as possible before allowing the ball to pass the deflector.
+
+\begin{figure}
+\includegraphics[]{atari.jpg}
+\end{figure}
+
+\subsection{MountainCar-v0}
+MountainCar was our second selected environment to complement the game Breakout, which we knew we would use. MountainCar is a simple game setup where a small car must build up momentum by accelerating up alternating slopes in order to reach a goal height. The agent selects either a 3-element discrete action (accelerate left, right, or none), or in the continuous version of the game selects from a continuum of directional accelerations. MountainCar returns a reward depending on the time taken by the agent to reach the goal height.
+
+\begin{figure}
+\includegraphics[]{car.jpg}
+\end{figure}
+
+This game is significantly smaller than the breakout game in terms of state size, as well as being significantly easier to solve, as the optimal strategy is significantly less complex than the space of Breakout strategies. We expect the training process of this game to be significantly faster than Breakout, letting us train greater numbers of agents and optimize the hyperparameters of these agent significantly more than in the Breakout setting, where even using WPI computation clusters the training can take days.
+
 \section{Background Information} \label{background}
 
 \subsection{Deep Q Learning}
-Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For some of our environments this will be a convolution over a screen space, and for some we might extract some derived features about the game for the model to use as a state representation.
+Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For our Breakout environment this will be a convolution over a stack screen space samples, and for Mountaincar the model is a simple fully-connected network over the state game state: the car position and car velocity.
+
+Deep Q Learning is trained by minimizing the loss taken by evaluating the Q(s,a) value between the agent's state-value function and a target Q function, which is not optimized but occasionally updated to keep the training Q learning.
 
 \subsection{Double Deep Q Learning}
 Double deep Q networks address the maximization bias problem from Deep q learning by instead letting two Q functions randomly select the action and update the corresponding Q function. This process inhibits bias and will potentially converge faster or outright outperform DQN on all tasks.
 
 \subsection{Dueling Deep Q Learning}
 Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states by accounting for a learned state-value function $V(s)$, as well as an advantage function $A(s,a)$ interpreted as the value of taking action $a$ while in state $s$. For this reason this different approach will be interesting to analyze on tasks where the actions might not always directly affect the environment, for example in breakout where many movements have no direct affect on the game environment.
+
+\subsection{Multistep DQN Models}
 
 \subsection{Basic Policy Gradient}
 Policy gradient algorithms in general are methods that learn a parameterized policy that can select actions without consulting a value function \cite{ReinforcementLearningBook}.
@@ -170,7 +196,7 @@ Unlike the Basic and REINFORCE policy gradient algorithms, the Proximal Policy O
 \subsection{Advantage Actor Critic}
 Actor-Critic methods, similar to the REINFORCE algorithm, learn both a policy function and state-value function.
 The main difference between them, however, is the fact that actor-critic methods use the value function as a way to bootstrap the value estimation.
-The implementation for this work follows closely to the "One-step Actor-Critic" algorithm outlined in \cite{ReinforcementLearningBook} with some practical updates for implementation.
+The implementation for this work follows closely to the "One-step Actor-Critic" algorithm outlined in \cite{ReinforcementLearningBook} with some practical updates for implementation and stands as a synchronous adaptation of the Asynchronous Advantage Actor critic algorithm (A3C) presented in \cite{mnih2016asynchronous}.
 It is a temporal difference algorithm that relies solely on the current step for learning.
 This is in contrast to the many of the other algorithms implemented in this work as they involve utilizing a replay buffer for batch learning.
 
@@ -178,9 +204,83 @@ In addition, it should be noted that this implementation remains a basic impleme
 
 \section{Methodology} \label{methodology}
 
-\subsection{Tools and Environment}
-This project was implemented using the Python language and relied heavily on the openai gym packages.
-In addition, the code from Project 3 was adapted to serve as a baseline for interacting with the gym environments described next.
+\subsection{Tools and Framework}
+This project used the Python language and several python libraries. 
+In addition to the standard libraries, the following additional libraries were used:
+ 
+\begin{itemize}
+    \item OpenAI Gym \cite{openaigym}
+    \item PyTorch
+    \item NumPy
+    \item Matplotlib
+    \item Pandas
+\end{itemize}
+
+The framework provided from Project 3 was built off of and adapted to support additional environments aside from Breakout.
+A framework was built such that the main training and testing pipeline was consistent across algorithm implementations.
+This allowed for each team member to focus on implementing specific models and algorithm learning details.
+
+The general workflow using this framework can be seen in Listing \ref{listing:basicModelWorkflow}.
+
+\begin{lstlisting}[
+    float=t,
+    caption=\textbf{Algorithm Development Workflow} The basic workflow used to develop new models and algorithms.,
+    label=listing:basicModelWorkflow,
+]
+
+# Create a new model in models directory
+# - Implement the __init__ function
+# - Implement the forward function
+
+# Create a new agent in the agents directory
+# - Implement the make_action function
+# - Implement the can_train function
+# - Implement the train function
+
+# Execute training for model on command line
+# python main.py \
+#    --train_dqn \
+#    --model sample_model.SampleModel \
+#    --agent sample_agent.SampleAgent \
+#    --other_arguments
+
+\end{lstlisting}
+
+It should be noted that all agents inherit a set of functions from a base class allowing for a small barrier to entry in setting up new agents.
+An agent runner class was constructed such that it handles the main training loop used by all algorithms implemented while the learning details are held within the specific agents themselves.
+
+In addition, during model training, this framework stores all arguments used to start the session as well as periodic interim models and statistics in both raw format and as plots.
+This allowed for repeatability and easy metrics collection during every session.
+An example view of what this archive directory looks like can be seen in Listing \ref{listing:sampleModelArchive}.
+
+\begin{lstlisting}[
+    float=t,
+    caption=\textbf{Model Training Archive} A typical archive from a model that has been trained for 2000 episodes.,
+    label=listing:sampleModelArchive,
+]
+
+archive/
+   |
+   test_learning_rate/
+       |
+       args.pkl
+       1000_model.pth
+       1000_optimizer.pth
+       1000_training_metrics.csv
+       1000_training_reward_plot.png
+       1000_test_metrics.csv
+       1000_test_reward_plot.png
+       2000_model.pth
+       2000_optimizer.pth
+       2000_training_metrics.csv
+       2000_training_reward_plot.png
+       2000_test_metrics.csv
+       2000_test_reward_plot.png
+\end{lstlisting}
+
+\subsection{Gym Environments}
+Several different environments from the openai gym python packages were utilized on this project.
+A description of each of these environments and a description of the task to be solved by agents within them follows.
 
 \subsubsection{BreakoutNoFrameskip-v4}
 The Breakout environment involves interacting with the Atari 2600 game by the agent receiving image data for what has been seen on screen.
@@ -236,124 +336,221 @@ The reward structure for this environment consists of -1 for each time step unti
 The environment is considered solved if an average of -110 points is achieved over 100 consecutive trials \footnote{https://github.com/openai/gym/wiki/MountainCar-v0}.
 
 \subsection{Continuous Action Spaces}
+One of the key goals for this project was to interact in an environment with continuous action spaces.
+In general, models that operate in discrete action spaces take as input the state space (or state-space and action) and return either a value function or policy function.
+The value function represents the value of the particular state and the policy function generally provides an action or probabilities for which actions to execute.
+
+When dealing with continuous action spaces, this is shifted such that the policy learned is the mean and standard deviation for desirable actions within a continuous action space.
+As the agent learns, the standard deviation generally starts out wide and then narrows once it is more confident in the actions to take.
+Choosing an action consists of sampling from the learned distribution.
+
+\subsection{Continuous Advantage Actor Critic Implementation}
+The actor critic implementation follows closely to the "One-step Actor-Critic" algorithm outlined in \cite{ReinforcementLearningBook} with some practical updates made for implementation adapted from Phil Tabor's public codebase \footnote{https://github.com/philtabor}.
+This implementation is a temporal difference algorithm using no replay buffer and using only the current time step information to facilitate learning.
+In addition, it is implemented in an on-policy manner.
+
+The target for this model was the MountainCarContinuous-v0 environment so the model and agent were structured with this in mind.
+One can see the model structure and hyperparameters of the final model in Listing \ref{listing:continuousActorCriticModel} and Table \ref{table:continuousActorCriticHypers} respectively.
+
+
+\begin{lstlisting}[
+  float=t,
+  caption=\textbf{Continuous Actor Critic Model}  The model architecture used for the continuous actor critic implementation.,
+  label=listing:continuousActorCriticModel,
+]
+Fully Connected:   2 Input,512 Output
+ReLU
+
+|
+v
+
+Fully Connected:  512 Input, 512 Output  
+ReLU
+
+|\
+| \
+|  \
+|   |
+|   v
+|  Value Output Layer:  512 Input; 1 Output
+|
+v
+
+Policy Mean 
+Output Layer:   512 Input;  1 Output
+tanh
+
+Policy Standard Deviation 
+Output Layer:  512 Input;  1 Output
+Softplus
+\end{lstlisting}
+
+\begin{table}[htbp]
+    \caption{\textbf{Continuous Advantage Actor Critic Hyperparameters}  The hyperparameters used for training the continuous actor critic agent.}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\
+\hline
+\textbf{Batch Size} & Does not apply \\
+\hline
+\textbf{Learning Rate} & 0.00015 \\
+\hline
+\textbf{Replay Buffer Size} & Does not apply \\
+\hline
+\textbf{Minimum Buffer Training Size} & Does not apply \\
+\hline
+\textbf{Starting Epsilon} & Does not apply \\
+\hline
+\textbf{Final Epsilon} & Does not apply \\
+\hline
+\textbf{Epsilon Decay Steps} & Does not apply \\
+\hline
+\textbf{Gamma} & 0.99\\
+\hline
+\textbf{Loss Function} &  -log\_loss * advantage \\
+\hline
+\textbf{Optimizer} & Adam \\
+\hline
+\textbf{Target Network Update Interval} & Does not apply \\
+\hline
+\end{tabular}
+\label{table:continuousActorCriticHypers}
+\end{center}
+\end{table}
+
+
+\subsection{Discrete Advantage Actor Critic Implementation}
+The discrete version of the actor critic algorithm adapted the continuous version discussed earlier for the BreakoutNoFrameskip-v4 environment.
+This included incorporating a known model baseline previously shown effective in this environment while adapting it for returning both the policy and values necessary for the actor critic method.
+
+The model structure and hyperparameters for this implementation can be seen in Listing \ref{listing:discreteActorCriticModel} and Table \ref{table:discreteActorCriticHypers} respectively.
+
+\begin{lstlisting}[
+  float=t,
+  caption=\textbf{Discrete Actor Critic Model}  The model architecture used for the discrete actor critic implementation.,
+  label=listing:discreteActorCriticModel,
+]
+CNN:  32 8x8 filters, stride 4
+ReLU
+
+|
+v
+
+CNN:  64 4x4 filters, stride 2
+ReLU
+
+|
+v
+
+CNN:  64 3x3 filters, stride 1
+ReLU
+
+|
+v
+
+Fully Connected: 3136 Input; 512 Output
+ReLU
+
+|\
+| \
+|  \
+|   |
+|   v
+|  Value Output Layer:  512 Input; 1 Output
+|
+v
+
+Policy Output Layer: 512 Input;  4 Output
+SoftMax
+\end{lstlisting}
+
+\begin{table}[htbp]
+    \caption{\textbf{Discrete Advantage Actor Critic Hyperparameters}  The hyperparameters used for training the discrete actor critic agent.}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\
+\hline
+\textbf{Batch Size} & Does not apply \\
+\hline
+\textbf{Learning Rate} & 0.0003\\
+\hline
+\textbf{Replay Buffer Size} & Does not apply \\
+\hline
+\textbf{Minimum Buffer Training Size} & Does not apply \\
+\hline
+\textbf{Starting Epsilon} & Does not apply \\
+\hline
+\textbf{Final Epsilon} & Does not apply \\
+\hline
+\textbf{Epsilon Decay Steps} & Does not apply \\
+\hline
+\textbf{Gamma} & 0.99\\
+\hline
+\textbf{Loss Function} &  -log\_loss * advantage \\
+\hline
+\textbf{Optimizer} & Adam \\
+\hline
+\textbf{Target Network Update Interval} & Does not apply \\
+\hline
+\end{tabular}
+\label{table:discreteActorCriticHypers}
+\end{center}
+\end{table}
 
 \section{Results} \label{results}
 
-\section{Planned Work} \label{planned}
+\subsection{Continuous Advantage Actor Critic}
+The continuous actor critic agent was exercised using the MountainCarContinuous-v0 environment.
+This agent as implemented was able to obtain adequate scores in this game as well as meet the benchmark of 90 that is considered beating the game.
+This can be seen in the test reward plot in Figure \ref{fig:actorCriticGoodTestRewardMcc}.
+In this plot a scores near 80 are achieved for starting at episode 7000 with the highest score coming in at 91.06.
 
-\subsection{Background Research}
-Research is planned to be performed to understand all of the techniques to be exercised during this project.
-In addition, the literature will be surveyed to identify any recent developments or improvements related to the methods being employed.
-While doing this, we also plan to obtain available benchmarks for techniques such as those found in \cite{DQNOriginalPaper, NatureDeepLearning, bhonker2017playing}.
-To keep experiments fair to models and reduce compute time, we will find hyperparameter suggestions by model authors where available, but not directly tune one model's hyperparameters for a single game task. Rather, heuristics will be used in their place to attempt to simultaneously generalize models across tasks while keeping experimental design relatively fair.
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{best_actor_critic_mcc_test.png}}
+\caption{\textbf{The actor critic agent playing MountainCarContinuous-v0}  The actor critic agent successfully learns how to win the MountainCarContinuous-v0 environment.}
+\label{fig:actorCriticGoodTestRewardMcc}
+\end{figure}
 
-\subsection{Environment Setup}
-This part of the project involves ensuring that all team members have the ability to develop and assess the algorithms under study.
-Some of the key areas include ensuring a common (or compatible) software environment is available including the ability to run \cite{nichol2018retro} either locally or on a WPI asset such as the Ace cluster.
-In addition, a simple framework or skeleton code should be utilized such that all algorithm implementations are structurally similar.
-We plan to take advantage of the provided framework from Project 3 to reduce the amount of work necessary in this area.
+This environment was run multiple times with this same agent to confirm consistency of results.
+While this type of result was achieved consistently there were also runs that displayed some of the known issues with the stability of the actor critic method.
+Looking at the training plot from a run in Figure \ref{fig:actorCriticBadTrainingMcc},  it can be seen that the agent begins to learn, then ultimately fails to learn after 5000 episodes of training.
 
-\subsection{Algorithm Implementations}
-The algorithm implementations involve taking the actual theoretical algorithms and implementing them in Python code using common libraries such as PyTorch and NumPy.
-The goal of these implementations is to be true to the algorithms and any notable improvements that have become common in practice.
-While deviations and modifications to these algorithms may become necessary for practical reasons, they will be noted in the final report provided, and no modifications would be made which fundamentally alters the behavior of agents in the games we are testing. The primary goal is to evaluate convergence speed, time to a goal score, and consistency of results across tasks.
+This can be compared to the plot of a typical successful training of the agent as seen in Figure \ref{fig:actorCriticGoodTrainingMcc}.
+In this plot one can see a pronounced general upward trend in the learning which has essentially converged around 9000 episodes.
 
-\subsection{Results Analysis}
-During the analysis of the results each model will be compared using common metrics such reward per episode and the number of episodes necessary for convergence.
-In addition, commentary will be provided of any interesting results or findings from the experiments that do not fit into the objective metrics being measured.
-We will incorporate our knowledge from researching capabilities of the models as well as our intuitions gained from implementing the algorithms to analyze their performances in both testing and training. After considering case-by-case performances of each model, we can consider the field of agents to determine if there is a subset of 'best' models which consistently outperformed their peers, and maintained that success even across diverse tasks. Ranking quality of models across these tasks can be done with metrics such as training time to achieve a threshold score, max score reached given a limited training time, and consistency of performance across tasks.
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{bad_actor_critic_mcc.png}}
+\caption{\textbf{A bad training session for actor critic agent playing MountainCarContinuous-v0}  The actor critic method has stability issues that can affect training.}
+\label{fig:actorCriticBadTrainingMcc}
+\end{figure}
 
-\subsection{Work Completed}
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{best_actor_critic_mcc.png}}
+\caption{\textbf{A typical training session for actor critic agent playing MountainCarContinuous-v0}  A typical training session for the actor critic method.}
+\label{fig:actorCriticGoodTrainingMcc}
+\end{figure}
 
-Our largest contribution to the final deliverable so far is the development of an agent-game pair running file, in which the researcher inputs arguments into the terminal corresponding to the model and task they would like to dispatch for training. This means all of our model implementations must be written such that they are indifferent to different environment types, state shapes, model attributes, or other quirks arising in agent training. This means that all agents must inherit from a superclass of a general agent framework, and particularities in training (such as the difference between training on state-action-reward tuples, episodes, or tuples of episodes must be addressed in one execution of the model's unique 'train()' function, which is called in the general 'agent\_runner' executed file.
-At the testing time determined by the 'agent\_runner' call, this same process occurs though in a simpler fashion where the generic 'agent.make\_action' refers to a trained policy and state-value function to play the game it was trained on.
-The development of this general dispatcher will serve two primary purposes for the remaining work of the project. First, this shared dispatcher file will assure consistent running of each model, where changes can be made to environments and shared parameters without needing to rely on manual changes to many ($num\_tasks*num\_agents$) files. Second, this greatly expedites batch computation when training models on cluster computers, as we can serialize calls for any number of agents, games, and hyperparameters as we see necessary.
+\subsection{Discrete Advantage Actor Critic}
+The discrete advantage actor critic agent was trained and executed on the BreakoutNoFrameskip-v4 environment.
+Through this training we were unable to see significant learning taking place.
+The actor critic methods can be sensitive to hyperparameters such as learning rate so a hyperparameter search through multiple learning rates was performed though none of them seemed to affect the learning of the agent.
+A summary of these failed attempts can be seen in Figure \ref{fig:actorCriticLearningRateSearch}.
 
-So far, we have draft versions of the following algorithms:
-\begin{enumerate}
-\item Policy Gradient REINFORCE
-\item DQN
-\item Double DQN
-\item Dueling DQN
-\end{enumerate}
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.4]{actor_critic_breakout_lr_search.png}}
+\caption{\textbf{A search through various learning rates for actor critic on Breakout.}  Changing the hyperparameter for learning rate did not improve the results for the discrete version of actor critic on the Breakout environment.}
+\label{fig:actorCriticLearningRateSearch}
+\end{figure}
 
-The following algorithms are unstarted or in a very early stage:
-\begin{enumerate}
-\item PPO Policy Gradient
-\item Basic Policy Gradient
-\end{enumerate}
+While better results were expected overall for this agent, its implementation lacked essentially all of the hallmark improvements made in \cite{DQNOriginalPaper} and \cite{NatureDeepLearning} such as usage of a target network and replay buffer.
+It is suspected that in a future work one may be able to make some of these adjustments such as use of a replay buffer and see improved results.
 
-\subsection{Paper Preparation}
-A roughly 10 page paper will be put together to conclude this project and communicate its findings.
-This paper will include any background information necessary for the project, a description of algorithms used and considered, implementation methods, results, and analysis.
-
-\subsection{Presentation Preparation}
-The work of this project will be summarized in a presentation to be delivered on the poster day for the project.
-If any work is found to be an interesting demo it would be displayed during the presentation time. Potential presentation results include:
-\begin{itemize}
-    \item Expected score in testing after a fixed training time in seconds or iterations for each game
-    \item Necessary training time in seconds or iterations to achieve a fixed score for each game
-    \item Comparison of learning rates of models for each game
-    \item Meta-comparison of games, their action spaces, and relevant challenges and tasks. This will include discussion on the nature of each algorithm as well as our expectations for the performance given the quirks of each task. We will include mathematical intuition for why some models would struggle or fail to learn in some environments.
-\end{itemize}
-
-\section{Tools and Environment}
-
-\subsection{Implementation Language}
-This project will be using the Python language of at least version 3.7.
-In addition to the standard libraries, it is expected that the following additional libraries will be utilized and standardized across group development machines:
- 
-\begin{itemize}
-    \item Gym Retro \cite{nichol2018retro}
-    \item PyTorch
-    \item NumPy
-    \item Matplotlib
-    \item Pandas
-\end{itemize}
-
-In addition, the framework from Project 3 will be utilized as a baseline for implementing the various algorithms being researched. Each algorithm can be fit in this framework to facilitate plug-and-train pipelines for each different model and game.
-
-\subsection{Reinforcement Learning Environment}
-This project plans to use an existing reinforcement learning environment while assessing the various algorithm implementations.
-In particular, the Retro Learning Environment \cite{nichol2018retro} will be utilized for its large selection of games with high levels of complexity.
-We maintain the usage of the Atari Breakout gym environment for multiple reasons. The breakout environment will be familiar to our peers as something they worked extensively with on project 3, and know the implementation tricks as well as the expected rewards of a DQN model, for example. This will contextualize a results plot which shows perhaps that DQN is outperformed by other models, to some comprehensible scale.
-In addition, it maintains the same API as the environment used in Project 3 making it close to a drop-in replacement for the existing Project 3 framework with our mentioned extensions to add robustness to model differences, game flexibility, and other algorithm needs.
-
-The initial plan was to focus on the games explored in \cite{bhonker2017playing} as there is a baseline result for several algorithms and a known level of complexity.
-Some of the options to be explored include F-Zero, Gradius 3, Mortal Kombat, and Wolfenstein.
-We have altered this course to instead use a simple by continuous-space environment provided by the OpenAI Gym. This will lead to stability in comparing the tasks, as the environments are provided by the same source despite the games being very different. In addition a simpler task might lead to more reasonable results, where we know even DQN can have some small success, where we worried that extremely complex games might lead to uninteresting results if some models fail to learn any meaningful parameters during training.
-Note that the choice of game is subject to change depending on availability of published results and practical reasons given the time frame for the project.
-These games represent diversity in action spaces, reward sparsity, action-memory importance, and state dimensionality.
-
-\subsection{Compute Resources}
-The plan for compute resources is to use a combination of local machines as well as the Ace cluster at WPI.
-Several team members have access to personal machines with GPUs while other team members have access to the Ace cluster.
-These resources combined should provide sufficient computing resources to be successful on this project.
-Dispatching batches of jobs can also expedite and parallelize long training times. Compute resources were a limiting factor for the developement of this project, as each of the agent-model-task combinations must be trained independently and for each combination of hyperparameters. Since project 3 took many weeks to optimize just a single agent-task combination with some parameter set, optimizing up to 12 experiments would be intractable, as though there is some carryover between parameter choices between similar agents on the same task, these parameters do not carry over between tasks, and there is a massive space of parameters to explore, particularly when agents include their own unique parameter options. The implementation of such arguments alone is a large task to handle over multiple tasks.
-
-\section{Final Deliverables} \label{deliverables}
-
-\subsection{Final Report}
-The final report provided as part of this project will include the necessary background information required to understand the methods used.
-In addition, our findings on $N*K$ trained models where N is our number of agents and K is our number of games will be included.
-The analysis of our findings will include theory on why some models performed better or worse given the game tasks, appropriate model choices for different tasks, and a discussion on our findings of what succeeded and failed for developing diverse models over diverse tasks.
-In addition, a description of our methodology will be provided such that others could use our workflow to do the same experiments.
-
-\subsection{Poster Presentation}
-The presentation delivered as part of this project will provide an overview of the information covered in the final report.
-This includes brief background information and a focus on the comparative results received.
-If applicable, any live demos will be rendered and performed during this portion of the project. These live demos will include some subset of our experiments, likely our best-trained models on the Breakout and MountainCar tasks rendered by the built-in functionality of the Atari and Box2d environments.
-
-\subsection{Code and Model Artifacts}
-All code and artifacts needed to duplicate this project will be provided as part of the deliverables for this project.
-In addition, all trained models used in reported performance measures will be saved and provided.
+This result was interesting as it showed an algorithm that performs well in a continuous action space environment did not translate well to one with discrete actions.
+One factor affecting this, however, may be the increased complexity of the game of Breakout compared to that of the mountain car problem.
 
 \section{Conclusion} \label{conclusion}
-Here, there should be an in-depth discussion about the way each model performed on each task and how those findings either agree or disagree with our expectations and hypotheses about the models, tasks, agents, and parameters.
-
-This project represents an approximate survey of diverse models from the Reinforcement Learning course, as well as the challenges and benefits of implementation of these methods on very different tasks. The project goal was effectively a combination of 6 models across 2 tasks, taking for 12 applications of a Project-3-like assignment. However, instead of simply doing 12 unique projects, this group wanted to emphasize the contrast in application between these different models on these different tasks.
-
-Among the time-expensive nature of training many agents on multiple tasks, our largest efforts were in the developement of so many different models. These difficulties were effectively 6-8 project three developement times, as we split the agent developement among team members. In hindsight, in order to better address the goals of this project, we would make some changes to the experimental design and workflow of the project. Having a shared `agent_runner` was a huge benefit, but instead of using that common core to develop many diverse agents, it is possible we could better address the goals of the experiment by using fewer models and more tasks. This change would give a better sense of the __benchmarking__ goal, as it would be interesting to compare some kind of human-performance normalized results of a handful of agents (DQN, policy gradient,) on many tasks, such as every atari game. As it stands, the deployment of more agents is an interesting comparison on a small number of tasks, but most of our resources went into the developement of these diverse agents, as opposed to truly optimizing and benchmarking them. Another option to ameliorate these difficulties would be to rely only on other researcher's implementations of these algorithms, so that our group could focus on applying them and getting as many results as possible, instead of troubleshooting and programming.
 
 \bibliography{citations.bib}{}
 \bibliographystyle{plain}
