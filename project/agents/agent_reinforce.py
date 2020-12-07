@@ -57,10 +57,10 @@ class REINFORCE(Agent):
         """
         ###########################
         # YOUR IMPLEMENTATION HERE #
-        # with torch.no_grad(): ?
         policy = self.model.forward(
                 torch.from_numpy(np.array([observation]).transpose(0, 3, 1, 2)).float().to(self.device))
         action = np.random.choice(self.num_actions, p=np.squeeze(policy.detach().numpy()))
+        print(action)
         ###########################
         return action
 
@@ -87,9 +87,9 @@ class REINFORCE(Agent):
         training_states = self.buffer.replay_buffer_states
         training_actions = self.buffer.replay_buffer_actions
         training_rewards = self.buffer.replay_buffer_rewards
-        training_next_states = self.buffer.replay_buffer_next_states
-        training_dones = self.buffer.replay_buffer_dones
-        return training_states, training_actions, training_rewards, training_next_states, training_dones
+        # training_next_states = self.buffer.replay_buffer_next_states
+        # training_dones = self.buffer.replay_buffer_dones
+        return training_states, training_actions, training_rewards
 
         ###########################
 
@@ -107,7 +107,7 @@ class REINFORCE(Agent):
         self.optimizer.zero_grad()
 
         # Get Full-batch for training
-        training_states, training_actions, training_rewards, training_next_states, training_dones = self.replay_buffer()
+        training_states, training_actions, training_rewards = self.replay_buffer()
 
         returns = []
         log_probabilities = []
@@ -118,7 +118,7 @@ class REINFORCE(Agent):
             log_probabilities.append(self.calculate_log_prob(state, action))
             Gt = 0
             step = 0
-            for reward in [training_rewards][i:-1]:
+            for reward in list(training_rewards)[i:-1]:
                 Gt += self.gamma ** step * reward
                 step += 1
             returns.append(Gt)
@@ -139,6 +139,7 @@ class REINFORCE(Agent):
         self.buffer.clear()
 
         # Return loss
+        print(loss.detach().item())
         return loss.detach().item()
 
     def calculate_log_prob(self, state, action):
@@ -146,4 +147,3 @@ class REINFORCE(Agent):
             torch.from_numpy(np.array([state]).transpose(0, 3, 1, 2)).float().to(self.device))
         log_prob = torch.log(policy.squeeze(0)[action])
         return log_prob
-
