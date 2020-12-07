@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import random
@@ -35,7 +36,7 @@ class REINFORCE(Agent):
         super(REINFORCE, self).__init__(env, args, model, device)
         ###########################
         # YOUR IMPLEMENTATION HERE #
-        self.num_actions = self.env.action_space.n
+        self.num_actions = 1
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # Load optimizer and loss function here
@@ -44,6 +45,7 @@ class REINFORCE(Agent):
 
         # Any agent specific items done here
         self.target_model = copy.deepcopy(self.model)
+        self.log_probs = []
 
     def make_action(self, observation, epsilon, test=True):
         """
@@ -57,31 +59,25 @@ class REINFORCE(Agent):
         """
         ###########################
         # YOUR IMPLEMENTATION HERE #
-        if self.num_actions == 4:
-            policy = self.model.forward(
-                    torch.from_numpy(np.array([observation]).transpose(0, 3, 1, 2)).float().to(self.device))
-            action = np.random.choice(self.num_actions, p=np.squeeze(policy.detach().numpy()))
-        else:
-            mean, sigma = self.model.forward(torch.from_numpy(observation).float().to(self.device))
+        # Get our return from the network
+        mean, sigma = self.model.forward(torch.from_numpy(observation).float().to(self.device))
 
-            # Sample an action from the distribution
-            action_distro = torch.distributions.Normal(mean, sigma)
-            raw_action = action_distro.sample(sample_shape=torch.Size([1]))
+        # Sample an action from the distribution
+        action_distro = torch.distributions.Normal(mean, sigma)
+        raw_action = action_distro.sample(sample_shape=torch.Size([1]))
 
-            # Make sure these are within the proper boundaries
-            raw_action = raw_action.flatten()
-            action = torch.tanh(raw_action)
+        # Make sure these are within the proper boundaries
+        raw_action = raw_action.flatten()
+        action = torch.tanh(raw_action)
 
-            # Store the log probability for calculating loss later
-            self.log_probs = action_distro.log_prob(action).to(self.device)
-
-            ###########################
-
-            # Return the actual action (probs is a bad name at this point...)
-            return action.cpu().numpy()
-
+        # Store the log probability for calculating loss later
+        # log_prob = action_distro.log_prob(action).to(self.device)
+        # self.log_probs.append(log_prob)
         ###########################
-        return action
+
+        # Return the actual action (probs is a bad name at this point...)
+        return action.cpu().numpy()
+
 
     def push(self, replay_entry=None):
         """ You can add additional arguments as you need.
@@ -144,7 +140,6 @@ class REINFORCE(Agent):
         policy_gradients = []
         for Gt, log in zip(returns, log_probabilities):
             policy_gradients.append(-log * Gt)
-
         # Calculate our loss
         loss = torch.stack(policy_gradients).sum()
 
@@ -156,13 +151,20 @@ class REINFORCE(Agent):
 
         # Clear buffer
         self.buffer.clear()
-
+        self.log_probs = []
         # Return loss
-        print(loss.detach().item())
         return loss.detach().item()
 
     def calculate_log_prob(self, state, action):
-        policy = self.model.forward(
-            torch.from_numpy(np.array([state]).transpose(0, 3, 1, 2)).float().to(self.device))
-        log_prob = torch.log(policy.squeeze(0)[action])
+        mean, sigma = self.model.forward(torch.from_numpy(state).float().to(self.device))
+
+        action_distro = torch.distributions.Normal(mean, sigma)
+        raw_action = action_distro.sample(sample_shape=torch.Size([1]))
+
+        # Make sure these are within the proper boundaries
+        raw_action = raw_action.flatten()
+        action = torch.tanh(raw_action)
+        # Sample an action from the distribution
+        action_distro = torch.distributions.Normal(mean, sigma)
+        log_prob = action_distro.log_prob(action).to(self.device)
         return log_prob
