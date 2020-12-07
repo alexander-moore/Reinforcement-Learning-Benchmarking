@@ -70,42 +70,50 @@ stang3@wpi.edu}
 \maketitle
 
 \begin{abstract}
-    Understanding which models succeed (and why) at which tasks is a foundational experience in reinforcement learning.
+    Understanding which models succeed and why at which tasks is a foundational experience in reinforcement learning.
     Following a baseline of techniques and best practices found in the literature this project will show a comparison of multiple reinforcement learning techniques applied in a few common environments.
     In particular, this project implements several algorithms under the Q-learning, policy learning, and actor-critic categories and compares the results across several tasks.
-    It is shown where these algorithms work strongly on some tasks and perform poorly on others.
+    We demonstrate the strengths and weaknesses of a large sample of models on discrete-action and continuous action tasks.
     This work explores a set of baseline results for diverse reinforcement learning algorithms, in order to compare and contrast the performance of models on diverse tasks.
+    Results sentence here.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Q-Learning, Policy Learning, DQN, Policy Gradient, actor-critic, Reinforcement Learning
+Q-Learning, Policy Learning, Policy Gradient, Actor-Critic, Reinforcement Learning
 \end{IEEEkeywords}
 
 \section{Introduction}
-Project 3 explored how to construct a Deep Q Network (DQN) by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
-Building off of this recent experience this project takes the deep learning techniques discussed in class and applies them to several well-known tasks using Q-learning, policy learning, and actor-critic methods.
+Project 3 explored how to construct a Deep Q Network (DQN) or a similar model by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
+Building off of this recent experience this project takes the deep learning techniques discussed in class and applies them to several well-known tasks using Q-learning, policy learning, and actor-critic methods. Our group implemented, optimized, and benchmarked a large variety of models from these diverse families in order to analyze and discuss the success and failures of each model. We quantify model success by comparing the scores achieved as well as the time-to-convergence in terms of training episodes needed to reach a threshold score.
 The results of these methods are compared and discussed.
 
 The openai gym \footnote{https://gym.openai.com/} was chosen to be used as the game environment.
 Two games were chosen to be used for comparison of the algorithms in this paper.
 First, the Breakout game was used for its familiarity from Project 3 and that it has a known level of difficulty.
-In addition, it serves as a discrete action space environment.
+In addition, it serves as a discrete action space environment. The Breakout-v0 game is a productive demonstration as part of the poster presentation since the students in the class are all familiar with the process of implementing, optimizing, and testing a DQN-family model on the game. This will contextualize both the work of the project as well as expected score results, for example 50 for a baseline and 400 for the best-scorers in the course.\footnote{https://github.com/yingxue-zhang/DS595CS525-RL-Projects/tree/master/Project3}
 To contrast with this, the MountainCar was also chosen as it has both a discrete and continuous action space environment available for use.
-Using these environments multiple agents were trained and tested using DQN, Double DQN, Dueling DQN, REINFORCE, Proximal Policy Optimization (PPO), and Advantage Actor Critic (A2C).
-This work shows that these algorithms all have strengths and weaknesses in a wide variety of areas including task completion, complexity, training time, and sensitivity to hyperparameters.
+Using these environments multiple agents were implemented, trained, and tested using DQN, Double DQN, Dueling DQN, REINFORCE, Proximal Policy Optimization (PPO), and Advantage Actor Critic (A2C).
+This work shows that these algorithms all have strengths and weaknesses in a wide variety of areas including task completion, complexity, training time, and sensitivity to hyperparameters. Ultimately, the success of models is left largely to the hyperparameter selection and tuning step.
 
 The remainder of this paper is organized as follows:
 \begin{itemize}
+\item Section \ref{envs} lists our considered and selected environments, with a brief description and motivation for each.
 \item Section \ref{background} provides background information regarding the methods implemented.
 \item Section \ref{methodology} provides a description of the methodology used to train, execute, and assess the algorithms explored.
 \item Section \ref{results} provides a discussion of the training process and associated results.
 \item Finally, the paper concludes in section \ref{conclusion}.
 \end{itemize}
 
+\section{Environments} \label{envs}
+
+\subsection{Breakout-v0}
+
+\subsection{MountainCar-v0}
+
 \section{Background Information} \label{background}
 
 \subsection{Deep Q Learning}
-Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For some of our environments this will be a convolution over a screen space, and for some we might extract some derived features about the game for the model to use as a state representation.
+Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For our Breakout environment this will be a convolution over a stack screen space samples, and for Mountaincar the state is only two values: the car position and car velocity.
 
 \subsection{Double Deep Q Learning}
 Double deep Q networks address the maximization bias problem from Deep q learning by instead letting two Q functions randomly select the action and update the corresponding Q function. This process inhibits bias and will potentially converge faster or outright outperform DQN on all tasks.
