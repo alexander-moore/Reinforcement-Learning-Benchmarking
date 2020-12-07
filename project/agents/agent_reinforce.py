@@ -60,7 +60,7 @@ class REINFORCE(Agent):
         if self.num_actions == 4:
             policy = self.model.forward(
                     torch.from_numpy(np.array([observation]).transpose(0, 3, 1, 2)).float().to(self.device))
-            action = np.random.choice(self.num_actions, p=np.squeeze(policy.detach().numpy()))
+            action = np.random.choice(self.num_actions, p=np.squeeze(policy.detach().cpu().numpy()))
         else:
             mean, sigma = self.model.forward(torch.from_numpy(observation).float().to(self.device))
 
