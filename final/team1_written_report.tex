@@ -82,7 +82,7 @@ stang3@wpi.edu}
 Q-Learning, Policy Learning, Policy Gradient, Actor-Critic, Reinforcement Learning
 \end{IEEEkeywords}
 
-\section{Introduction}
+\section{Introduction} \label{intro}
 Project 3 explored how to construct a Deep Q Network (DQN) or a similar model by following the classic DQN algorithm outlined originally in \cite{DQNOriginalPaper}.
 Building off of this recent experience this project takes the deep learning techniques discussed in class and applies them to several well-known tasks using Q-learning, policy learning, and actor-critic methods. Our group implemented, optimized, and benchmarked a large variety of models from these diverse families in order to analyze and discuss the success and failures of each model. We quantify model success by comparing the scores achieved as well as the time-to-convergence in terms of training episodes needed to reach a threshold score.
 The results of these methods are compared and discussed.
@@ -584,7 +584,7 @@ First, we did get interesting results on the comparison of models on our two tas
 
 Additionally, the environments selected are as meaningful to the hypothesis as they are hard to select. It is hard to select two or more environments as experimental subjects that can well-discern the differences between models. For example in machine learning, two models can be directly compared over some selection of parameter searching, and quantify their variance and accuracy. However in reinforcement learning, training times for optimization over some set of parameters might be intractable, as well as quantification of their performance can be additionally challenging: are we interested in time-to-convergence? Variability in rewards? Mean reward in testing? These challenges are only exacerbated by the selection of additional games, where the innate complexity of reinforcement learning and the combination of policy, value functions, and agent training all drastically affect the outcome of the model's understanding of the game. For this reason, a few amended research directions are proposed.
 
-As discussed, 
+As discussed, the scope of models proposed for this project was very wide. A selection of five distinct discrete-action agents as well as four policy gradient agents were all individually implemented from scratch. The additional complication of attempted development over two tasks only complicated this process further. Our goal as discussed in section \ref{intro}, was to compare the performance of models across tasks, with an additional on bench-marking models on each task. The outcome of this ideal proposal would be twofold: a set of results showing with some confidence the relative quality of models on particular results, as well as the pre-trained models which earned those results for future usage. Secondly, this project would show how agents change in *relative* quality as the task changes. Ideally, this comparison could be made over a large set of very diverse tasks: from discrete and continuous actions, large and complex state spaces to very simple ones (such as MountainCar), and strategies of simple and complex nature. This could be a fascinating results to have even an approximation of, which would serve both novice reinforcement learning students with an brief understanding of what works and why, as well as for experts seeking a benchmark for agents which generally thrive at certain tasks, such as learning simple strategies very quickly.
 
 \bibliography{citations.bib}{}
 \bibliographystyle{plain}
