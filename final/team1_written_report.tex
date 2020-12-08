@@ -617,6 +617,28 @@ The discrete version of the PPO algorithm heavily leveraged the continuous versi
 
 \section{Results} \label{results}
 
+\subsection{DQN-Family Breakout Results}
+With the set of 5 DQN-family models (DQN, Double DQN, Dueling DQN, Multistep DQN, and Multistep DDQN), we did an additional investigation into the importance of the learning rate. For this reason we both benchmark the 5 models with the same low learning rate, then do a comparative experiment of a the same set of models where the only change is a significantly higher learning rate.
+
+\begin{figure}
+\includegraphics[]{DQNs_breakout_high_train.png}
+\caption{The five models show large differences in the ability to quickly improve when using a large learning rate. We see that Double DQN without Action Separation significantly departs from the pack in terms of performance. Though Double DQN fails to learn in 20,000 iterations, the model is implemented correctly, shown by the performance in the low-learning-rate trials.}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[]{DQNs_breakout_high.png}
+\caption{The testing performances shown here and consistent with the training rewards: Double DQN without action seperation drastically outperforms all others in terms of rapid learning acceleration in Breakout.}
+\end{figure}
+
+\subsection{DQN-Family MountainCar Results}
+For the MountainCar implementation of the DQN family, we expected a larger difference than what we observe here. It is possible that the simple nature of the game in terms of both the state and optimal policy makes it hard for some models to succeed drastically more than others. To a suprising degree, we see the training rewards of all three DQN models highly consistent, both in tertms of the initial acceleration in learning as well as the moment and hieght of the plateau around 1000 iterations to a score around -120.
+
+\begin{figure}
+\includegraphics[]{DQN_family_car.png}
+\caption{The three DQN models implemented on the discrete MountainCar game show remarkably similar behavior in training.}
+\end{figure}
+
 \subsection{Continuous Advantage Actor Critic}
 The continuous actor critic agent was exercised using the MountainCarContinuous-v0 environment.
 This agent as implemented was able to obtain adequate scores in this game as well as meet the benchmark of 90 that is considered beating the game.
