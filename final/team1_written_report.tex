@@ -92,7 +92,15 @@ Two games were chosen to be used for comparison of the algorithms in this paper.
 First, the Breakout game was used for its familiarity from Project 3 and that it has a known level of difficulty.
 In addition, it serves as a discrete action space environment. The Breakout-v0 game is a productive demonstration as part of the poster presentation since the students in the class are all familiar with the process of implementing, optimizing, and testing a DQN-family model on the game. This will contextualize both the work of the project as well as expected score results, for example 50 for a baseline and 400 for the best-scorers in the course.\footnote{https://github.com/yingxue-zhang/DS595CS525-RL-Projects/tree/master/Project3}
 To contrast with this, the MountainCar was also chosen as it has both a discrete and continuous action space environment available for use.
-Using these environments multiple agents were implemented, trained, and tested using DQN, Double DQN, Dueling DQN, REINFORCE, Proximal Policy Optimization (PPO), and Advantage Actor Critic (A2C).
+Using these environments multiple agents were implemented, trained, and tested using DQN, Double DQN, Dueling DQN, Multistep DQN, Multistep Double DQN, REINFORCE, Proximal Policy Optimization (PPO), and Advantage Actor Critic (A2C).
+A breakdown of where these algorithms are categorized in the field of reinforcement learning can be seen in Figure \ref{fig:agentsImplemented}.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.4]{implemented_agents.png}}
+\caption{\textbf{Implemented Agents in the field of Reinforcement Learning}  A breakdown of where the implemented agents in this paper are categorized in the wider field of reinforcement learning.}
+\label{fig:agentsImplemented}
+\end{figure}
+
 This work shows that these algorithms all have strengths and weaknesses in a wide variety of areas including task completion, complexity, training time, and sensitivity to hyperparameters. Ultimately, the success of models is left largely to the hyperparameter selection and tuning steps.
 
 The remainder of this paper is organized as follows:
