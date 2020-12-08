@@ -8,6 +8,7 @@ DO NOT revise this file
 import argparse
 import numpy as np
 from environment import Environment
+import time
 
 seed = 11037
 
@@ -42,6 +43,7 @@ def test(agent, env, total_episodes=30, render_test=False):
             state, reward, done, info = env.step(action)
             if render_test:
                 env.env.render()
+                time.sleep(0.01)
             episode_reward += reward
 
         rewards.append(episode_reward)

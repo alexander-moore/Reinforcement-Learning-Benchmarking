@@ -48,7 +48,8 @@ class Agent(object):
         Put anything you want to initialize if necessary
 
         """
-        raise NotImplementedError("Subclasses should implement this!")
+        #raise NotImplementedError("Subclasses should implement this!")
+        pass
 
     def can_train(self):
         """
