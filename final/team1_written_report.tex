@@ -162,8 +162,8 @@ The REINFORCE Policy Gradient method also referred to as Monte-Carlo Policy Grad
 This change can be seen in the pseudocode in Listing \ref{listing:reinforcePolicyGradientAlg}. 
 
 \begin{lstlisting}[
-    float=h,
-    mathescape = true
+    float=t,
+    mathescape = true,
     caption=\textbf{REINFORCE Policy Gradient} The reinforce policy gradient algorithm,
     label=listing:reinforcePolicyGradientAlg,
 ]
@@ -178,7 +178,29 @@ return {$\theta$}
 \end{lstlisting}
 
 \subsection{PPO Policy Gradient}
-Unlike the Basic and REINFORCE policy gradient algorithms, the Proximal Policy Optimization (PPO) algorithm is an off-policy method, where the performance assessment and improvement of a policy is different than the one used for action selection (or sampling). The separate policies allow the collected data to be used more than once, which result in faster performance. PPO also addresses other shortcomings of the Basic Policy Gradient by subtracting the state-value off as the baseline to improve update accuracy when rewards are non-negative via an Advantage function. This function also serves to reduce large variance without increasing bias. Finally, PPO improves stability by imposing a constraint on the distance (or difference) between the old and new policies by clipping their ratio to a small interval around one.
+Unlike the Basic and REINFORCE policy gradient algorithms, the Proximal Policy Optimization (PPO) algorithm is an off-policy method, where the performance assessment and improvement of a policy is different than the one used for action selection (or sampling). The separate policies allow the collected data to be used more than once, which result in faster performance. Furthermore, typical policy gradient algorithms perform updates only once per sample while PPO can perform multiple updates with minibatches of each sample. PPO also addresses other shortcomings of the Basic Policy Gradient by subtracting the state-value as the baseline to improve update accuracy when rewards are non-negative via an Advantage function. This function also serves to reduce large variance without increasing bias. Finally, PPO improves stability by imposing a constraint on the distance (or difference) between the old and new policies by clipping their ratio to a small interval around one. Due to this constraint, some critics believe that PPO should be considered an on-policy method.
+
+There are different implementation options for the PPO algorithm, as outlined in (cite Shulman, et. al. 2017). The one chosen for this work is known as the Actor-Critic Style but with only one actor implemented. The psuedocode is depicted in Listing \ref{listing:PPOPolicyGradientAlg}. The Actor-Critic method, specifically A2C, is described in the next subsection. In addition, entropy bonus and clipping (without the KL divergence penalty) of the surrogate objective function and a decaying learning rate were implemented in this work.
+
+\begin{lstlisting}[
+    float=t,
+    mathescape = true,
+    caption=\textbf{PPO Policy Gradient, Actor-Critic Style},
+    label=listing:PPOPolicyGradientAlg,
+]
+
+for $\textnormal{iteration = 1, 2,... do:}$
+    for $\textnormal{actor = 1, 2,...,}$ N $\textnormal{do: (N = 1 in this implementation)}$
+        $\textnormal{Collect dataset based on policy}$ $\pi_{\theta}_{old}$ $\textnormal{for}$ $\emph{T}$ $\textnormal{steps}$
+        $\textnormal{Compute advantages (}$${\hat{A}}_1,..., {\hat{A}}_T$$\textnormal{) using}$
+            $\textnormal{Generalized Advantage Estimation (GAE)}$
+    $\textnormal{end}$ for
+    $\textnormal{Optimize surrogate objective}$ $\emph{L}$ $\textnormal{wrt}$ $\theta$ $\textnormal{by taking}$ $\emph{K}$ $\textnormal{steps}$
+        $\textnormal{with minibatch (size}$ $\emph{M} \leq \emph{T}$$\textnormal{) SGD (}$$\emph{Adam}$$\textnormal{)}$
+    $\theta_{old} \longleftarrow \theta$
+$\textnormal{end}$ for
+
+\end{lstlisting}
 
 \subsection{Advantage Actor Critic}
 Actor-Critic methods, similar to the REINFORCE algorithm, learn both a policy function and state-value function.
