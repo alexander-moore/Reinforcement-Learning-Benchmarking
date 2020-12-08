@@ -502,12 +502,20 @@ SoftMax
 The continuous actor critic agent was exercised using the MountainCarContinuous-v0 environment.
 This agent as implemented was able to obtain adequate scores in this game as well as meet the benchmark of 90 that is considered beating the game.
 This can be seen in the test reward plot in Figure \ref{fig:actorCriticGoodTestRewardMcc}.
-In this plot a scores near 80 are achieved for starting at episode 7000 with the highest score coming in at 91.06.
+In this plot scores near 80 are achieved for starting at episode 7000 with the highest score coming in at 91.06.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[scale=0.5]{best_actor_critic_mcc_test.png}}
 \caption{\textbf{The actor critic agent playing MountainCarContinuous-v0}  The actor critic agent successfully learns how to win the MountainCarContinuous-v0 environment.}
 \label{fig:actorCriticGoodTestRewardMcc}
+\end{figure}
+
+Figure \ref{fig:fullWinA2CMountainCar} displays the general steps learned by the agent to gain enough momentum to reach the goal.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.3]{full_win.png}}
+\caption{\textbf{Typical Strategy learned to win Mountain Car.}  The actor critic learned this strategy to win mountain car by rocking  back and forth to gain enough momentum to reach the goal.}
+\label{fig:fullWinA2CMountainCar}
 \end{figure}
 
 This environment was run multiple times with this same agent to confirm consistency of results.
