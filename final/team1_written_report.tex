@@ -97,32 +97,11 @@ This work shows that these algorithms all have strengths and weaknesses in a wid
 
 The remainder of this paper is organized as follows:
 \begin{itemize}
-\item Section \ref{envs} lists our considered and selected environments, with a brief description and motivation for each.
 \item Section \ref{background} provides background information regarding the methods implemented.
 \item Section \ref{methodology} provides a description of the methodology used to train, execute, and assess the algorithms explored.
 \item Section \ref{results} provides a discussion of the training process and associated results.
 \item Finally, the paper concludes in section \ref{conclusion}.
 \end{itemize}
-
-\section{Environments} \label{envs}
-
-\subsection{Breakout-v0}
-Breakout was introduced to all members of the Reinforcement Learning class as part of Project 3. This task is an Atari game environment provided by the OpenAI Gym package. The game takes a discrete-action input of the paddle direction and returns a state, a stack of 4 frames of pixels corresponding to the 4 most recent game screens.
-
-We selected this game because of its familiarity to all members of the class, as they all know the challenges and process of model and agent implementation, parameter tuning, and likely have read the paper introducing the task for DQN. They are also familiar with the level of work and training to get a model to the 50-point threshold, as well as the best models in the course getting a score up to 400 points. The reward in Breakout is given by the Atari game itself, as the goal is to destroy as many blocks as possible before allowing the ball to pass the deflector.
-
-\begin{figure}
-\includegraphics[]{atari.jpg}
-\end{figure}
-
-\subsection{MountainCar-v0}
-MountainCar was our second selected environment to complement the game Breakout, which we knew we would use. MountainCar is a simple game setup where a small car must build up momentum by accelerating up alternating slopes in order to reach a goal height. The agent selects either a 3-element discrete action (accelerate left, right, or none), or in the continuous version of the game selects from a continuum of directional accelerations. MountainCar returns a reward depending on the time taken by the agent to reach the goal height.
-
-\begin{figure}
-\includegraphics[]{car.jpg}
-\end{figure}
-
-This game is significantly smaller than the breakout game in terms of state size, as well as being significantly easier to solve, as the optimal strategy is significantly less complex than the space of Breakout strategies. We expect the training process of this game to be significantly faster than Breakout, letting us train greater numbers of agents and optimize the hyperparameters of these agent significantly more than in the Breakout setting, where even using WPI computation clusters the training can take days.
 
 \section{Background Information} \label{background}
 
@@ -285,6 +264,14 @@ A description of each of these environments and a description of the task to be 
 \subsubsection{BreakoutNoFrameskip-v4}
 The Breakout environment involves interacting with the Atari 2600 game by the agent receiving image data for what has been seen on screen.
 After pre-processing handled by the atari wrapper code the state space consists of 4 stacked 84x84 images.
+An example of the original environment that would be viewed by a human playing the game can be seen in Figure \ref{fig:atariBreakoutEnvironment}.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.1]{atari_breakout_sample.png}}
+\caption{\textbf{Example of the Breakout environment.}  The Atari Breakout environment provided by openai.}
+\label{fig:atariBreakoutEnvironment}
+\end{figure}
+
 The action space for this environment consists of 4 possible discrete actions:
 
 \begin{itemize}
@@ -320,6 +307,8 @@ The reward structure for this environment consists of the agent receiving a smal
 This environment is considered solved once a score of 90 is achieved \footnote{https://github.com/openai/gym/wiki/MountainCarContinuous-v0}.
 
 This environment was chosen as it is a well-suited introductory environment to explore continuous action spaces.
+The game is significantly smaller than the breakout game in terms of state size, as well as being significantly easier to solve, as the optimal strategy is significantly less complex than the space of Breakout strategies.
+We expect the training process of this game to be significantly faster than Breakout, letting us train a greater number of agents and optimize the hyperparameters of these agent significantly more than in the Breakout setting.
 
 \subsubsection{MountainCar-v0}
 The MountainCar-v0 environment is the discrete action-space relative of MountainCarContinuous-v0 as described above.
