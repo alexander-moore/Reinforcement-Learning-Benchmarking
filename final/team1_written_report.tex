@@ -180,7 +180,7 @@ return {$\theta$}
 \subsection{PPO Policy Gradient}
 Unlike the Basic and REINFORCE policy gradient algorithms, the Proximal Policy Optimization (PPO) algorithm is an off-policy method, where the performance assessment and improvement of a policy is different than the one used for action selection (or sampling). The separate policies allow the collected data to be used more than once, which result in faster performance. Furthermore, typical policy gradient algorithms perform updates only once per sample while PPO can perform multiple updates with minibatches of each sample. PPO also addresses other shortcomings of the Basic Policy Gradient by subtracting the state-value as the baseline to improve update accuracy when rewards are non-negative via an Advantage function. This function also serves to reduce large variance without increasing bias. Finally, PPO improves stability by imposing a constraint on the distance (or difference) between the old and new policies by clipping their ratio to a small interval around one. Due to this constraint, some critics believe that PPO should be considered an on-policy method.
 
-There are different implementation options for the PPO algorithm, as outlined in \cite{schulman2017proximal}. The one chosen for this work is known as the Actor-Critic Style but with only one actor implemented. The psuedocode is depicted in Listing \ref{listing:PPOPolicyGradientAlg}. The Actor-Critic method, specifically A2C, is described in the next subsection. In addition, entropy bonus and clipping (without the KL divergence penalty) of the surrogate objective function and a decaying learning rate were implemented in this work.
+There are different options for implementing the PPO algorithm, as outlined in \cite{schulman2017proximal}. The one chosen for this work is known as the Actor-Critic Style but with only one actor. The psuedocode is depicted in Listing \ref{listing:PPOPolicyGradientAlg}. The Actor-Critic method, specifically A2C, is described in the next subsection. In addition, entropy bonus and clipping (without the KL divergence penalty) of the surrogate objective function and a decaying learning rate were implemented in this work. Finally, the estimation of advantages followed the Generalized Advantage Estimation (GAE) approach described in \cite{schulman2018highdimensional}.
 
 \begin{lstlisting}[
     float=t,
@@ -438,6 +438,54 @@ Softplus
 \end{center}
 \end{table}
 
+\subsection{Continuous PPO Implementation}
+As previously stated, our PPO implementation follows the Actor-Critic style. As a result, the structure of the model is identical to that of the one depicted in Listing \ref{listing:continuousActorCriticModel}. Otherwise, the remaining parts of the algorithm are almost identical to the one outlined in the \cite{schulman2017proximal}. Some modifications include the hyperparameter settings and the omission of the KL divergence penalty and a decaying clipping parameter. The hyperparameters for our implementation of the continuous version of the PPO algorithm are shown in Table \ref{table:continuousPPOHypers}.
+
+\begin{table}[htbp]
+    \caption{\textbf{Continuous PPO Hyperparameters}  The hyperparameters used for training the continuous PPO agent.}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\
+\hline
+\textbf{Steps (T)} & 128 \\
+\hline
+\textbf{$\#$ of Actors} & 1 \\
+\hline
+\textbf{Batch Size (M)} & 128 \\
+\hline
+\textbf{Minibatch Size} & 4 \\
+\hline
+\textbf{$\#$ of Minibatches} & 32 \\
+\hline
+\textbf{Network Update Epochs (K)} & 4 \\
+\hline
+\textbf{Learning Rate} & 0.00015 \\
+\hline
+\textbf{Learning Rate Decay} & Does not apply \\
+\hline
+\textbf{Replay Buffer Size} & Does not apply \\
+\hline
+\textbf{Discount Factor ($\gamma$)} & 0.99 \\
+\hline
+\textbf{GAE Parameter ($\lambda$)} & 0.95 \\
+\hline
+\textbf{Prob. Ratio Clipping ($\epsilon$)} & 0.2\\
+\hline
+\textbf{Clipping Decay} & Does not apply \\
+\hline
+\textbf{Value Function Loss Coef.} & 0.5 \\
+\hline
+\textbf{Entropy Coef.} & 0.01 \\
+\hline
+\textbf{Loss Function} & Surrogate Objective \\
+\hline
+\textbf{Optimizer} & Adam \\
+\hline
+\end{tabular}
+\label{table:continuousPPOHypers}
+\end{center}
+\end{table}
 
 \subsection{Discrete Advantage Actor Critic Implementation}
 The discrete version of the actor critic algorithm adapted the continuous version discussed earlier for the BreakoutNoFrameskip-v4 environment.
@@ -515,6 +563,55 @@ SoftMax
 \hline
 \end{tabular}
 \label{table:discreteActorCriticHypers}
+\end{center}
+\end{table}
+
+\subsection{Discrete PPO Implementation}
+The discrete version of the PPO algorithm heavily leveraged the continuous version discussed earlier. The major difference is the incorporation of a convolutional neural network (CNN) based model identical to the one used by the discrete Actor Critic algorithm as depicted in Listing \ref{listing:discreteActorCriticModel}. The hyperparameters for our implementation of the discrete version of the PPO algorithm are shown in Table \ref{table:discretePPOHypers}.
+
+\begin{table}[htbp]
+    \caption{\textbf{Discrete PPO Hyperparameters}  The hyperparameters used for training the discrete PPO agent.}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\
+\hline
+\textbf{Steps (T)} & 2048 \\
+\hline
+\textbf{$\#$ of Actors} & 1 \\
+\hline
+\textbf{Batch Size (M)} & 2048 \\
+\hline
+\textbf{Minibatch Size} & 4 \\
+\hline
+\textbf{$\#$ of Minibatches} & 512 \\
+\hline
+\textbf{Network Update Epochs (K)} & 4 \\
+\hline
+\textbf{Learning Rate} & 0.0003 \\
+\hline
+\textbf{Learning Rate Decay} & -2.75e-8 / step \\
+\hline
+\textbf{Replay Buffer Size} & Does not apply \\
+\hline
+\textbf{Discount Factor ($\gamma$)} & 0.99 \\
+\hline
+\textbf{GAE Parameter ($\lambda$)} & 0.95 \\
+\hline
+\textbf{Prob. Ratio Clipping ($\epsilon$)} & 0.2\\
+\hline
+\textbf{Clipping Decay} & Does not apply \\
+\hline
+\textbf{Value Function Loss Coef.} & 0.5 \\
+\hline
+\textbf{Entropy Coef.} & 0.01 \\
+\hline
+\textbf{Loss Function} & Surrogate Objective \\
+\hline
+\textbf{Optimizer} & Adam \\
+\hline
+\end{tabular}
+\label{table:discretePPOHypers}
 \end{center}
 \end{table}
 
