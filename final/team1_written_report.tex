@@ -617,6 +617,24 @@ The discrete version of the PPO algorithm heavily leveraged the continuous versi
 
 \section{Results} \label{results}
 
+\subsection{DQN-Family Breakout Results}
+With the set of 5 DQN-family models (DQN, Double DQN, Dueling DQN, Multistep DQN, and Multistep DDQN), we did an additional investigation into the importance of the learning rate. For this reason we both benchmark the 5 models with the same low learning rate, then do a comparative experiment of a the same set of models where the only change is a significantly higher learning rate.
+
+\begin{figure}
+\includegraphics[]{DQNs_breakout_high_train.png}
+\end{figure}
+
+
+\begin{figure}
+\includegraphics[]{DQNs_breakout_high.png}
+\end{figure}
+
+\subsection{DQN-Family MountainCar Results}
+
+\begin{figure}
+\includegraphics[]{DQN_family_car.png}
+\end{figure}
+
 \subsection{Continuous Advantage Actor Critic}
 The continuous actor critic agent was exercised using the MountainCarContinuous-v0 environment.
 This agent as implemented was able to obtain adequate scores in this game as well as meet the benchmark of 90 that is considered beating the game.
