@@ -1,5 +1,11 @@
 # Group Project
 
+![Test Image 1](final/DQNs_breakout_high.png)
+![Test Image 1](final/DQNs_breakout_high_train.png)
+![Test Image 1](final/DQNs_breakout_low_train.png)
+![Test Image 1](final/DQNs_breakout_low_test.png)
+
+
 ## General Notes
 To implement a new agent and/or model one should just need to create a new file as outlined below with a couple functions implemented.
 Most things like a general training loop and collecting statistics during training are taken care of by agent\_runner.py or agent.py.
