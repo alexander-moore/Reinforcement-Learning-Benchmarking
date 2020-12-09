@@ -682,6 +682,29 @@ In this plot one can see a pronounced general upward trend in the learning which
 \label{fig:actorCriticGoodTrainingMcc}
 \end{figure}
 
+\subsection{Continuous PPO}
+The continuous PPO agent as implemented could not obtain acceptable scores when trained and exercised in the MountainCarContinuous-v0 environment. The agent repeatedly and consistently plateaued to scores of slightly below zero. In other words, the continuous PPO agent learned that the highest scores were achieved if it moved as little as possible and remained in the bottom of the mountain because every step is a negative reward. It never realized that there is a much larger reward available at the top. This occurrence can be seen in the typical training reward plot in Figure \ref{fig:PPOTypicalTrainRewardMCC}. An examination of the loss and entropy during and between the model updates did not reveal any unusual behaviors. The loss was low with the occasional spikes and entropy decreases with time, as expected. Loss and entropy for a typical training session are depicted in Figure \ref{fig:PPOTypicalTrainLossEntropyMCC}.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{PPO_Train_Reward_Plot_MCC_Typical.png}}
+\caption{\textbf{Typical Training Reward Plot for the PPO Agent.}  A typical training session for the PPO agent playing MountainCarContinuous-v0.}
+\label{fig:PPOTypicalTrainRewardMCC}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{PPO_Train_Loss_Entropy_Plot_MCC_Typical.png}}
+\caption{\textbf{Typical Training Loss and Entropy Bonus Plots for the PPO Agent.}  The loss and entropy during a typical training session for the PPO agent playing MountainCarContinuous-v0.}
+\label{fig:PPOTypicalTrainLossEntropyMCC}
+\end{figure}
+
+The plateau in the performance of the continuous PPO agent was also consistent when several hyperparameter values were modified, including the size and quantity of minibatches, and learning rates below a certain threshold. Figure \ref{fig:PPOLRComparedMCC} depicts the case where a learning rate of 0.003 is clearly too high since the mean rewards were consistently very low. All learning rates below 0.0003 did not improve the score, nor did they have any detrimental effects.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{PPO_Train_Reward_Plot_MCC_LRCompare.png}}
+\caption{\textbf{Learning Rate Comparison for the PPO Agent.}  A learning rate of 0.003 was too high and performance suffered as a result when compared to a lower rate of 0.00015.}
+\label{fig:PPOLRComparedMCC}
+\end{figure}
+
 \subsection{Discrete Advantage Actor Critic}
 The discrete advantage actor critic agent was trained and executed on the BreakoutNoFrameskip-v4 environment.
 Through this training we were unable to see significant learning taking place.
@@ -699,6 +722,23 @@ It is suspected that in a future work one may be able to make some of these adju
 
 This result was interesting as it showed an algorithm that performs well in a continuous action space environment did not translate well to one with discrete actions.
 One factor affecting this, however, may be the increased complexity of the game of Breakout compared to that of the mountain car problem.
+
+\subsection{Discrete PPO}
+The discrete PPO agent as implemented was unable to learn and achieve an acceptable score when trained and exercised in the BreakoutNoFrameskip-v4 environment. The average scores achieved by the agent consistently bounced between 0 and 0.7, with an average of approximately 0.3. Its performance was flat and displayed no improvements even after training more than 20,000 iterations, as can be seen in the typical training reward plot in Figure \ref{fig:PPOTypicalTrainRewardBreakout}. An examination of loss and entropy during and between the model updates did reveal a couple of unusual behaviors, as depicted in Figure \ref{fig:PPOTypicalTrainLossEntropyBreakout}. In general, the loss was low and very slowly decreasing, but a very noticeable pattern that correlates with the length of each horizon (or batch size) emerged. This artifact will need to be investigated further in the future. Entropy also slowly decreases with time, as expected, but there is a noticeable "hump" around iteration 10,000. The entropy bonus is used by the agent to balance exploration with exploitation. The shape of this entropy plot might indicate that it is still mostly in the exploration stage.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{PPO_Train_Reward_Plot_Breakout_Typical.png}}
+\caption{\textbf{Typical Training Reward Plot for the PPO Agent.}  A typical training session for the PPO agent playing BreakoutNoFrameskip-v4.}
+\label{fig:PPOTypicalTrainRewardBreakout}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{PPO_Train_Loss_Entropy_Plot_Breakout_Typical.png}}
+\caption{\textbf{Typical Training Loss and Entropy Bonus Plots for the PPO Agent.}  The loss and entropy during a typical training session for the PPO agent playing BreakoutNoFrameskip-v4.}
+\label{fig:PPOTypicalTrainLossEntropyBreakout}
+\end{figure}
+
+A decaying learning rate that began at a reasonably low value of 0.0003 and continued at a rate of 2.75e-8 per iteration did not improve the performance of the PPO agent. Due to resource constraints, a factorial experiment with the hyperparameters was not possible. It is highly likely that improved hyperparameters could result in higher scores. Additionally, there could be features not considered in this implementation that might improve its performance in this environment, including a decaying clipping parameter, the use of multiple actors and the inclusion of a replay buffer.
 
 \section{Conclusion} \label{conclusion}
 Our discussed findings focus on two primary conclusions: the meta-learning about the process of a research project such as, as well as the findings of results on models.
