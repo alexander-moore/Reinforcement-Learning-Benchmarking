@@ -442,6 +442,44 @@ Softplus
 \end{center}
 \end{table}
 
+\subsection{Continuous REINFORCE Policy Gradient Implementation}
+The REINFORCE Monte Carlo Policy Gradient algorithm was implemented to closely follow the pseudocode in \cite{ReinforcementLearningBook}. To maintain consistent comparisons between the Policy Gradient algorithms, the same model as the Actor Critic implementation was trained for the MountainCarContinuous-v0 environment which can be found in Listing \ref{listing:continuousActorCriticModel}. The REINFORCE model simply discarded the Value Output Layer and produced only the mean and standard deviations for the action as output. 
+The hyper parameters for this implementation can be found in Table \ref{table:countinuousREINFORCEHypers} 
+
+\begin{table}[htbp]
+    \caption{\textbf{Continuous REINFORCE Hyperparameters}  The hyperparameters used for training the continuous REINFORCE agent.}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Hyperparameter} & \textbf{Value} \\
+\hline
+\textbf{Batch Size} & Does not apply \\
+\hline
+\textbf{Learning Rate} & 0.000015\\
+\hline
+\textbf{Replay Buffer Size} & Does not apply \\
+\hline
+\textbf{Minimum Buffer Training Size} & Does not apply \\
+\hline
+\textbf{Starting Epsilon} & Does not apply \\
+\hline
+\textbf{Final Epsilon} & Does not apply \\
+\hline
+\textbf{Epsilon Decay Steps} & Does not apply \\
+\hline
+\textbf{Gamma} & 0.99\\
+\hline
+\textbf{Loss Function} &  -log\_loss * return \\
+\hline
+\textbf{Optimizer} & Adam \\
+\hline
+\textbf{Target Network Update Interval} & Does not apply \\
+\hline
+\end{tabular}
+\label{table:countinuousREINFORCEHypers}
+\end{center}
+\end{table}
+
 \subsection{Continuous PPO Implementation}
 As previously stated, our PPO implementation follows the Actor-Critic style. As a result, the structure of the model is identical to that of the one depicted in Listing \ref{listing:continuousActorCriticModel}. Otherwise, the remaining parts of the algorithm are almost identical to the one outlined in the \cite{schulman2017proximal}. Some modifications include the hyperparameter settings and the omission of the KL divergence penalty and a decaying clipping parameter. The hyperparameters for our implementation of the continuous version of the PPO algorithm are shown in Table \ref{table:continuousPPOHypers}.
 
@@ -570,6 +608,9 @@ SoftMax
 \end{center}
 \end{table}
 
+\subsection{Discrete REINFORCE Policy Gradient Implementation}
+The REINFORCE algorithm was also implemented for discrete action spaces, specifically for the openai BreakoutNoFrameskip-v4 environment with the model outlined in Listing \ref{listing:discreteActorCriticModel}, and again discarding the value output layer. 
+
 \subsection{Discrete PPO Implementation}
 The discrete version of the PPO algorithm heavily leveraged the continuous version discussed earlier. The major difference is the incorporation of a convolutional neural network (CNN) based model identical to the one used by the discrete Actor Critic algorithm as depicted in Listing \ref{listing:discreteActorCriticModel}. The hyperparameters for our implementation of the discrete version of the PPO algorithm are shown in Table \ref{table:discretePPOHypers}.
 
@@ -682,6 +723,16 @@ In this plot one can see a pronounced general upward trend in the learning which
 \label{fig:actorCriticGoodTrainingMcc}
 \end{figure}
 
+\subsection{Continuous REINFORCE Policy Gradient}
+The REINFORCE algorithm was unable to achieve great results in the MountainCarContinuous-v0 environment. As seen in the training reward plot Figure \ref{fig:REINFORCEMccTrain}, the agent is unable to achieve the score of 90 required to "solve" the game. In this case it learned to simply stay still to avoid the penalty of moving. The Monte Carlo methods suffer from a high variability and combined with the scarce reward in this environment, it was unable to overcome these obstacles. If the agent never stumbles upon the reward at the top of the hill, it will only know the penalty for moving and will therefore try to minimize the penalty instead of getting to the reward. A low learning rate was implemented to encourage more exploration, however it was unable to achieve the goal. 
+Some modifications to the reward system were attempted such as adding to the reward based on the y-coordinates or height of the agent on the hill, but the final results unfortunately	remained the same. 
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=0.5]{REINFORCEMccTrain.png}}
+\caption{\textbf{The training plot for a REINFORCE agent playing MountainCarContinuous-v0}  A training plot for the REINFORCE algorithm showing it was unable to learn the optimal policy.}
+\label{fig:REINFORCEMccTrain}
+\end{figure}
+
 \subsection{Continuous PPO}
 The continuous PPO agent as implemented could not obtain acceptable scores when trained and exercised in the MountainCarContinuous-v0 environment. The agent repeatedly and consistently plateaued to scores of slightly below zero. In other words, the continuous PPO agent learned that the highest scores were achieved if it moved as little as possible and remained in the bottom of the mountain because every step is a negative reward. It never realized that there is a much larger reward available at the top. This occurrence can be seen in the typical training reward plot in Figure \ref{fig:PPOTypicalTrainRewardMCC}. An examination of the loss and entropy during and between the model updates did not reveal any unusual behaviors. The loss was low with the occasional spikes and entropy decreases with time, as expected. Loss and entropy for a typical training session are depicted in Figure \ref{fig:PPOTypicalTrainLossEntropyMCC}.
 
@@ -722,6 +773,10 @@ It is suspected that in a future work one may be able to make some of these adju
 
 This result was interesting as it showed an algorithm that performs well in a continuous action space environment did not translate well to one with discrete actions.
 One factor affecting this, however, may be the increased complexity of the game of Breakout compared to that of the mountain car problem.
+
+\subsection{Discrete REINFORCE Policy Gradient}
+For the discrete version of REINFORCE we chose the popular BreakoutNoFrameskip-v4 environment. The agent was unable to learn a good policy for this environment and we attribute this to the simplicity of the REINFORCE algorithm as well as the complexity of the Breakout environment. We tested several different hyperparameters, but they followed the same trend as the Actor Critic plots in Figure \ref{fig:actorCriticLearningRateSearch}.
+This implementation also did not include some optimizations such as adding a baseline, which we hope to implement in the future to see better results.
 
 \subsection{Discrete PPO}
 The discrete PPO agent as implemented was unable to learn and achieve an acceptable score when trained and exercised in the BreakoutNoFrameskip-v4 environment. The average scores achieved by the agent consistently bounced between 0 and 0.7, with an average of approximately 0.3. Its performance was flat and displayed no improvements even after training more than 20,000 iterations, as can be seen in the typical training reward plot in Figure \ref{fig:PPOTypicalTrainRewardBreakout}. An examination of loss and entropy during and between the model updates did reveal a couple of unusual behaviors, as depicted in Figure \ref{fig:PPOTypicalTrainLossEntropyBreakout}. In general, the loss was low and very slowly decreasing, but a very noticeable pattern that correlates with the length of each horizon (or batch size) emerged. This artifact will need to be investigated further in the future. Entropy also slowly decreases with time, as expected, but there is a noticeable "hump" around iteration 10,000. The entropy bonus is used by the agent to balance exploration with exploitation. The shape of this entropy plot might indicate that it is still mostly in the exploration stage.
