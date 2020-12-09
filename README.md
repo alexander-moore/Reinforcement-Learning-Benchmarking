@@ -2,8 +2,8 @@
 
 ![Test Image 1](final/DQNs_breakout_high.png)
 ![Test Image 1](final/DQNs_breakout_high_train.png)
-![Test Image 1](final/DQNs_breakout_low_train.png)
 ![Test Image 1](final/DQNs_breakout_low_test.png)
+![Test Image 1](final/DQNs_breakout_low_train.png)
 
 
 ## General Notes
