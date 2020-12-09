@@ -674,7 +674,6 @@ In training the DQN demonstrated much greater robustness to learning rate differ
 \caption{Learning-rate at 1.5e-4 training rewards through time.}
 \end{figure}
 
-
 \begin{figure}
 \centerline{\includegraphics[scale=0.6]{DQN_family_breakout_results/high_lr_testing.png}
 \caption{The testing rate for our models during a learning-rate experiment at 1.5e-4, seen as the rewards from 100 testing trials during stages of training.}
@@ -689,6 +688,7 @@ In training the DQN demonstrated much greater robustness to learning rate differ
 \centerline{\includegraphics[scale=0.6]{DQN_family_breakout_results/low_lr_testing.png}
 \caption{For a low learning rate, the testing scores over 100 testing games during model training.}
 \end{figure}
+
 \subsection{DQN-Family MountainCar Results}
 For the MountainCar implementation of the DQN family, we expected a larger difference than what we observe here. It is possible that the simple nature of the game in terms of both the state and optimal policy makes it hard for some models to succeed drastically more than others. To a suprising degree, we see the training rewards of all three DQN models highly consistent, both in terms of the initial acceleration in learning as well as the moment and height of the plateau around 1000 iterations to a score around -120.
 
