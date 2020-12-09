@@ -114,21 +114,30 @@ The remainder of this paper is organized as follows:
 \section{Background Information} \label{background}
 
 \subsection{Deep Q Learning (DQN)}
-Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For our Breakout environment this will be a convolution over a stack screen space samples, and for Mountaincar the model is a simple fully-connected network over the state game state: the car position and car velocity.
+Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(S_{t}, A_{t}, R_{t+1},\gamma _{t+1},S_{t+1})$ state(S), action(A), reward(R) pairs stored in a memory replay buffer, improving the model's task reward. For our Breakout environment this will be a convolution over a stack screen space samples, and for Mountaincar the model is a simple fully-connected network over the state game state: the car position and car velocity.
+
+$(R_{t} + \gamma _{t} \underset{{a}'}{max}Q_{\bar{\Theta }}(S_{t},{a}')-Q_{\Theta }(S_{t},A_{t}))^{2}$
 
 Deep Q Learning is trained by minimizing the loss taken by evaluating the Q(s,a) value between the agent's state-value function and a target Q function, which is not optimized but occasionally updated to keep the training Q learning.
 
 \subsection{Double Deep Q Learning (DDQN)}
 Double deep Q networks address overestimation bias and instability in the traditional deep Q learning model by dividing the action selection and evaluation processes into two networks.  Value estimation is carried out by a more stable network that is periodically updated from the primary action selection network. This process inhibits bias and will generally converge faster or outright outperform DQN on all tasks.
 
+$Y{_{t}}^{DoubleDQN}\equiv R_{t+1}+\gamma Q(S_{t+1},\underset{a}{argmax}Q(S_{t+1},a;\Theta _{t}),\Theta {_{t}}^{-})$
+
 \subsection{Double Deep Q Learning ex Action Separation}
 As a varient to traditional DDQN networks, allowing action selection to be conducted by the value estimation network for target Q estimation adds additional stability to the network which may provide greater network stability and robustness towards higher learning rates versus the traditional algorithm.
+
+$Y{_{t}}^{DoubleDQN}\equiv R_{t+1}+\gamma Q(S_{t+1},\underset{a}{argmax}Q(S_{t+1},a;\Theta {_{t}}^{-}),\Theta {_{t}}^{-})$
 
 \subsection{Dueling Deep Q Learning}
 Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states by accounting for a learned state-value function $V(s)$, as well as an advantage function $A(s,a)$ interpreted as the value of taking action $a$ while in state $s$. For this reason this different approach will be interesting to analyze on tasks where the actions might not always directly affect the environment, for example in breakout where many movements have little direct affect on the game environment.
 
 \subsection{Multistep Deep Q Network Models}
-As opposed to single step Deep Q Learning, multi-step acrues rewards over n-step periods with rewards defined as 
+As opposed to single step Deep Q Learning, multi-step acrues rewards over n-step periods with rewards accumulated over that period with gamma discounting before being applied in a similar DQN structure.
+
+$R{_{t}}^{(n)} \equiv \sum_{k=0}^{n-1} \gamma {_{t}}^{(k)}R_{t+k+1}$
+$(R{_{t}}^{(n)} + \gamma {_{t}}^{(n)} \underset{{a}'}{max}Q_{\bar{\Theta }}(S_{t+n},{a}')-Q_{\Theta }(S_{t},A_{t}))^{2}$
 
 \subsection{Basic Policy Gradient}
 Policy gradient algorithms in general are methods that learn a parameterized policy that can select actions without consulting a value function \cite{ReinforcementLearningBook}.
@@ -794,6 +803,9 @@ The discrete PPO agent as implemented was unable to learn and achieve an accepta
 \end{figure}
 
 A decaying learning rate that began at a reasonably low value of 0.0003 and continued at a rate of 2.75e-8 per iteration did not improve the performance of the PPO agent. Due to resource constraints, a factorial experiment with the hyperparameters was not possible. It is highly likely that improved hyperparameters could result in higher scores. Additionally, there could be features not considered in this implementation that might improve its performance in this environment, including a decaying clipping parameter, the use of multiple actors and the inclusion of a replay buffer.
+
+\subsection{Discrete DQN Variations}
+In training the DDQN ex Action Separation demonstrated much greater robustness to learning rate differentials, while tolerating much larger learning rates than the other models for some speed advantage against similarly structured DQN based models.  Among models with total separation in action and value estimation, only the DDQN with multi-step (n=3) model provided enough model stability to train at similarly high rates (1.5e-4), albeit with weaker results over the first 10,000 episodes.  At lower learning rates (0.0001) nearly all of the models were able to demonstrate progress towards convergence, training efficiently to various degrees over the first 10,000 episodes.  The best performers in Breakout at the lower learning rate were the DDQN, DDQN ex Action Separation and Dueling DDQN.
 
 \section{Conclusion} \label{conclusion}
 Our discussed findings focus on two primary conclusions: the meta-learning about the process of a research project such as, as well as the findings of results on models.
