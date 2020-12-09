@@ -124,11 +124,6 @@ Double deep Q networks address overestimation bias and instability in the tradit
 
 $$Y{_{t}}^{DDQN}\equiv R_{t+1}+\gamma Q(S_{t+1},\underset{a}{argmax}Q(S_{t+1},a;\Theta _{t}),\Theta {_{t}}^{-})$$
 
-\subsection{Double Deep Q Learning ex Action Separation}
-As a variant to traditional DDQN networks, allowing action selection to be conducted by the value estimation network for target Q estimation adds additional stability to the network which may provide greater network stability and robustness towards higher learning rates versus the traditional algorithm.
-
-$$Y{_{t}}^{DDQN}\equiv R_{t+1}+\gamma Q(S_{t+1},\underset{a}{argmax}Q(S_{t+1},a;\Theta {_{t}}^{-}),\Theta {_{t}}^{-})$$
-
 \subsection{Dueling Deep Q Learning}
 Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states by accounting for a learned state-value function $V(s)$, as well as an advantage function $A(s,a)$ interpreted as the value of taking action $a$ while in state $s$. For this reason this different approach will be interesting to analyze on tasks where the actions might not always directly affect the environment, for example in breakout where many movements have little direct affect on the game environment.
 
@@ -672,7 +667,7 @@ The discrete version of the PPO algorithm heavily leveraged the continuous versi
 \subsection{DQN-Family Breakout Results}
 With the set of 5 DQN-family models (DQN, Double DQN, Dueling DQN, Multistep DQN, and Multistep DDQN), we did an additional investigation into the importance of the learning rate. For this reason we both benchmark the 5 models with the same low learning rate, then do a comparative experiment of a the same set of models where the only change is a significantly higher learning rate.
 
-In training the DDQN ex Action Separation demonstrated much greater robustness to learning rate differentials, while tolerating much larger learning rates than the other models for some speed advantage against similarly structured DQN based models.  Among models with total separation in action and value estimation, only the DDQN with multi-step (n=3) model provided enough model stability to train at similarly high rates (1.5e-4), albeit with weaker results over the first 10,000 episodes.  At lower learning rates (0.0001) nearly all of the models were able to demonstrate progress towards convergence, training efficiently to various degrees over the first 10,000 episodes.  The best performers in Breakout at the lower learning rate were the DDQN, DDQN ex Action Separation and Dueling DDQN.
+In training the DQN demonstrated much greater robustness to learning rate differentials, while tolerating much larger learning rates than the other models for some speed advantage against similarly structured DQN based models.  Among models with total separation in action and value estimation, only the DDQN with multi-step (n=3) model provided enough model stability to train at similarly high rates (1.5e-4), albeit with weaker results over the first 10,000 episodes.  At lower learning rates (0.0001) nearly all of the models were able to demonstrate progress towards convergence, training efficiently to various degrees over the first 10,000 episodes.  The best performers in Breakout at the lower learning rate were the DDQN and Dueling DDQN.
 
 \begin{figure}
 \centerline{\includegraphics[scale=0.6]{DQNs_breakout_high_train.png}}
