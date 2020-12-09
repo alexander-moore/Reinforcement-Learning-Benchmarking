@@ -670,22 +670,22 @@ With the set of 5 DQN-family models (DQN, Double DQN, Dueling DQN, Multistep DQN
 In training the DQN demonstrated much greater robustness to learning rate differentials, while tolerating a learning rate of 1.5e-4 better than the other models for some speed advantage against similarly structured DQN based models in early training.  Among models with total separation in action and value estimation, only the DDQN with multi-step (n=3) model provided enough model stability to train similarly at that laerning rate in early episodes, albeit with weaker results over the first 10,000 episodes.  With the learning rate at 1e-4 nearly all of the models were able to demonstrate similar progress towards convergence, training efficiently to various degrees over the first 10,000 episodes.  The best performers in Breakout at the latter learning rate were the DDQN and Dueling DDQN.
 
 \begin{figure}
-\centerline{\includegraphics[scale=0.6]{DQN_family_breakout_results/high_lr_training.png}
+\centerline{\includegraphics[scale=0.6]{DQN_family_breakout_results/high_lr_training.png}}
 \caption{Learning-rate at 1.5e-4 training rewards through time.}
 \end{figure}
 
 \begin{figure}
-\centerline{\includegraphics[scale=0.6]{DQN_family_breakout_results/high_lr_testing.png}
+\centerline{\includegraphics[scale=0.6]{DQN_family_breakout_results/high_lr_testing.png}}
 \caption{The testing rate for our models during a learning-rate experiment at 1.5e-4, seen as the rewards from 100 testing trials during stages of training.}
 \end{figure}
 
 \begin{figure}
-\centerline{\includegraphics[scale=0.6]{DQN_family_breakout_results/low_lr_training.png}
+\centerline{\includegraphics[scale=0.6]{DQN_family_breakout_results/low_lr_training.png}}
 \caption{For a low learning rate, the training rewards per episode during training, seen as a 30-iteration moving window.}
 \end{figure}
 
 \begin{figure}
-\centerline{\includegraphics[scale=0.6]{DQN_family_breakout_results/low_lr_testing.png}
+\centerline{\includegraphics[scale=0.6]{DQN_family_breakout_results/low_lr_testing.png}}
 \caption{For a low learning rate, the testing scores over 100 testing games during model training.}
 \end{figure}
 
