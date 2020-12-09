@@ -1,0 +1,2 @@
+[W NNPACK.cpp:80] Could not initialize NNPACK! Reason: Unsupported hardware.
+slurmstepd: error: *** JOB 24006 ON compute-1-09 CANCELLED AT 2020-12-07T23:31:01 DUE TO TIME LIMIT ***
