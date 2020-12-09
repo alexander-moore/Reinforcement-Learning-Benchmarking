@@ -113,18 +113,22 @@ The remainder of this paper is organized as follows:
 
 \section{Background Information} \label{background}
 
-\subsection{Deep Q Learning}
+\subsection{Deep Q Learning (DQN)}
 Deep Q learning uses a deep neural network to learn coefficients $\omega$ such that the network's value function evaluates $(state, action)$ pairs improving the model's task reward. For our Breakout environment this will be a convolution over a stack screen space samples, and for Mountaincar the model is a simple fully-connected network over the state game state: the car position and car velocity.
 
 Deep Q Learning is trained by minimizing the loss taken by evaluating the Q(s,a) value between the agent's state-value function and a target Q function, which is not optimized but occasionally updated to keep the training Q learning.
 
-\subsection{Double Deep Q Learning}
-Double deep Q networks address the maximization bias problem from Deep q learning by instead letting two Q functions randomly select the action and update the corresponding Q function. This process inhibits bias and will potentially converge faster or outright outperform DQN on all tasks.
+\subsection{Double Deep Q Learning (DDQN)}
+Double deep Q networks address overestimation bias and instability in the traditional deep Q learning model by dividing the action selection and evaluation processes into two networks.  Value estimation is carried out by a more stable network that is periodically updated from the primary action selection network. This process inhibits bias and will generally converge faster or outright outperform DQN on all tasks.
+
+\subsection{Double Deep Q Learning ex Action Separation}
+As a varient to traditional DDQN networks, allowing action selection to be conducted by the value estimation network for target Q estimation adds additional stability to the network which may provide greater network stability and robustness towards higher learning rates versus the traditional algorithm.
 
 \subsection{Dueling Deep Q Learning}
-Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states by accounting for a learned state-value function $V(s)$, as well as an advantage function $A(s,a)$ interpreted as the value of taking action $a$ while in state $s$. For this reason this different approach will be interesting to analyze on tasks where the actions might not always directly affect the environment, for example in breakout where many movements have no direct affect on the game environment.
+Dueling DQN separates the Q-learning process into two functions, the sum of the state and state-action estimator models. This approach ideally learns how to relatively value states by accounting for a learned state-value function $V(s)$, as well as an advantage function $A(s,a)$ interpreted as the value of taking action $a$ while in state $s$. For this reason this different approach will be interesting to analyze on tasks where the actions might not always directly affect the environment, for example in breakout where many movements have little direct affect on the game environment.
 
-\subsection{Multistep DQN Models}
+\subsection{Multistep Deep Q Network Models}
+As opposed to single step Deep Q Learning, multi-step acrues rewards over n-step periods with rewards defined as 
 
 \subsection{Basic Policy Gradient}
 Policy gradient algorithms in general are methods that learn a parameterized policy that can select actions without consulting a value function \cite{ReinforcementLearningBook}.
@@ -438,44 +442,6 @@ Softplus
 \end{center}
 \end{table}
 
-\subsection{Continuous REINFORCE Policy Gradient Implementation}
-The REINFORCE Monte Carlo Policy Gradient algorithm was implemented to closely follow the pseudocode in \cite{ReinforcementLearningBook}. To maintain consistent comparisons between the Policy Gradient algorithms, the same model as the Actor Critic implementation was trained for the MountainCarContinuous-v0 environment which can be found in Listing \ref{listing:continuousActorCriticModel}. The REINFORCE model simply discarded the Value Output Layer and produced only the mean and standard deviations for the action as output. 
-The hyper parameters for this implementation can be found in Table \ref{table:countinuousREINFORCEHypers} 
-
-\begin{table}[htbp]
-    \caption{\textbf{Continuous REINFORCE Hyperparameters}  The hyperparameters used for training the continuous REINFORCE agent.}
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-\textbf{Hyperparameter} & \textbf{Value} \\
-\hline
-\textbf{Batch Size} & Does not apply \\
-\hline
-\textbf{Learning Rate} & 0.000015\\
-\hline
-\textbf{Replay Buffer Size} & Does not apply \\
-\hline
-\textbf{Minimum Buffer Training Size} & Does not apply \\
-\hline
-\textbf{Starting Epsilon} & Does not apply \\
-\hline
-\textbf{Final Epsilon} & Does not apply \\
-\hline
-\textbf{Epsilon Decay Steps} & Does not apply \\
-\hline
-\textbf{Gamma} & 0.99\\
-\hline
-\textbf{Loss Function} &  -log\_loss * return \\
-\hline
-\textbf{Optimizer} & Adam \\
-\hline
-\textbf{Target Network Update Interval} & Does not apply \\
-\hline
-\end{tabular}
-\label{table:countinuousREINFORCEHypers}
-\end{center}
-\end{table}
-
 \subsection{Continuous PPO Implementation}
 As previously stated, our PPO implementation follows the Actor-Critic style. As a result, the structure of the model is identical to that of the one depicted in Listing \ref{listing:continuousActorCriticModel}. Otherwise, the remaining parts of the algorithm are almost identical to the one outlined in the \cite{schulman2017proximal}. Some modifications include the hyperparameter settings and the omission of the KL divergence penalty and a decaying clipping parameter. The hyperparameters for our implementation of the continuous version of the PPO algorithm are shown in Table \ref{table:continuousPPOHypers}.
 
@@ -604,9 +570,6 @@ SoftMax
 \end{center}
 \end{table}
 
-\subsection{Discrete REINFORCE Policy Gradient Implementation}
-The REINFORCE algorithm was also implemented for discrete action spaces, specifically for the openai BreakoutNoFrameskip-v4 environment with the model outlined in Listing \ref{listing:discreteActorCriticModel}, and again discarding the value output layer. 
-
 \subsection{Discrete PPO Implementation}
 The discrete version of the PPO algorithm heavily leveraged the continuous version discussed earlier. The major difference is the incorporation of a convolutional neural network (CNN) based model identical to the one used by the discrete Actor Critic algorithm as depicted in Listing \ref{listing:discreteActorCriticModel}. The hyperparameters for our implementation of the discrete version of the PPO algorithm are shown in Table \ref{table:discretePPOHypers}.
 
@@ -663,17 +626,21 @@ With the set of 5 DQN-family models (DQN, Double DQN, Dueling DQN, Multistep DQN
 
 \begin{figure}
 \includegraphics[]{DQNs_breakout_high_train.png}
+\caption{The five models show large differences in the ability to quickly improve when using a large learning rate. We see that Double DQN without Action Separation significantly departs from the pack in terms of performance. Though Double DQN fails to learn in 20,000 iterations, the model is implemented correctly, shown by the performance in the low-learning-rate trials.}
 \end{figure}
 
 
 \begin{figure}
 \includegraphics[]{DQNs_breakout_high.png}
+\caption{The testing performances shown here and consistent with the training rewards: Double DQN without action seperation drastically outperforms all others in terms of rapid learning acceleration in Breakout.}
 \end{figure}
 
 \subsection{DQN-Family MountainCar Results}
+For the MountainCar implementation of the DQN family, we expected a larger difference than what we observe here. It is possible that the simple nature of the game in terms of both the state and optimal policy makes it hard for some models to succeed drastically more than others. To a suprising degree, we see the training rewards of all three DQN models highly consistent, both in tertms of the initial acceleration in learning as well as the moment and hieght of the plateau around 1000 iterations to a score around -120.
 
 \begin{figure}
 \includegraphics[]{DQN_family_car.png}
+\caption{The three DQN models implemented on the discrete MountainCar game show remarkably similar behavior in training.}
 \end{figure}
 
 \subsection{Continuous Advantage Actor Critic}
@@ -715,16 +682,6 @@ In this plot one can see a pronounced general upward trend in the learning which
 \label{fig:actorCriticGoodTrainingMcc}
 \end{figure}
 
-\subsection{Continuous REINFORCE Policy Gradient}
-The REINFORCE algorithm was unable to achieve great results in the MountainCarContinuous-v0 environment. As seen in the training reward plot Figure \ref{fig:REINFORCEMccTrain}, the agent is unable to achieve the score of 90 required to "solve" the game. In this case it learned to simply stay still to avoid the penalty of moving. The Monte Carlo methods suffer from a high variability and combined with the scarce reward in this environment, it was unable to overcome these obstacles. If the agent never stumbles upon the reward at the top of the hill, it will only know the penalty for moving and will therefore try to minimize the penalty instead of getting to the reward. A low learning rate was implemented to encourage more exploration, however it was unable to achieve the goal. 
-Some modifications to the reward system were attempted such as adding to the reward based on the y-coordinates or height of the agent on the hill, but the final results unfortunately	remained the same. 
-
-\begin{figure}[htbp]
-\centerline{\includegraphics[scale=0.5]{REINFORCEMccTrain.png}}
-\caption{\textbf{The training plot for a REINFORCE agent playing MountainCarContinuous-v0}  A training plot for the REINFORCE algorithm showing it was unable to learn the optimal policy.}
-\label{fig:REINFORCEMccTrain}
-\end{figure}
-
 \subsection{Discrete Advantage Actor Critic}
 The discrete advantage actor critic agent was trained and executed on the BreakoutNoFrameskip-v4 environment.
 Through this training we were unable to see significant learning taking place.
@@ -742,10 +699,6 @@ It is suspected that in a future work one may be able to make some of these adju
 
 This result was interesting as it showed an algorithm that performs well in a continuous action space environment did not translate well to one with discrete actions.
 One factor affecting this, however, may be the increased complexity of the game of Breakout compared to that of the mountain car problem.
-
-\subsection{Discrete REINFORCE Policy Gradient}
-For the discrete version of REINFORCE we chose the popular BreakoutNoFrameskip-v4 environment. The agent was unable to learn a good policy for this environment and we attribute this to the simplicity of the REINFORCE algorithm as well as the complexity of the Breakout environment. We tested several different hyperparameters, but they followed the same trend as the Actor Critic plots in Figure \ref{fig:actorCriticLearningRateSearch}.
-This implementation also did not include some optimizations such as adding a baseline, which we hope to implement in the future to see better results.
 
 \section{Conclusion} \label{conclusion}
 Our discussed findings focus on two primary conclusions: the meta-learning about the process of a research project such as, as well as the findings of results on models.
