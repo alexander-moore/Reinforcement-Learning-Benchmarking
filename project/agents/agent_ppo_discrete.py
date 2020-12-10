@@ -175,14 +175,12 @@ class AgentPPO(Agent):
         Define an internal test mode to monitor total reward during training.
         """
         state = env.reset()
-        # Added the following two lines.
         state = (np.float32(state) / 255.0).transpose((2, 0, 1))
         state = torch.from_numpy(state).unsqueeze(0)
         done = False
         totalReward = 0
         while not done:
             with torch.no_grad():
-                # Modified the following line.
                 # state = torch.FloatTensor(state).unsqueeze(0).to(self.device)
                 # state = torch.FloatTensor(state).to(self.dev)
                 self.model.eval()
@@ -193,7 +191,9 @@ class AgentPPO(Agent):
                 # print(dist.probs.detach().numpy())
                 # print(dist.probs.detach().cpu().numpy().argmax().item())
                 # nextState, reward, done, _ = env.step(dist.sample().cpu().numpy()[0])
+
                 nextState, reward, done, _ = env.step(dist.probs.detach().cpu().numpy().argmax().item())
+                # nextState, reward, done, _ = env.step(dist.sample().cpu().numpy().squeeze())
                 nextState = (np.float32(nextState) / 255.0).transpose((2, 0, 1))
                 nextState = torch.from_numpy(nextState).unsqueeze(0)
                 state = nextState
@@ -271,12 +271,12 @@ class AgentPPO(Agent):
 
         device = self.dev
 
-        # Hyper-parameters (will add to super)
+        # Hyperparameters (will add to super)
         # Learning rate.
         lr = self.lr
         # Max number of steps to take for each episode. Or is it # of steps of the environment per update? 1024
         num_steps = 2048
-        # Number of training mini-batches per update.
+        # Number of training mini-batches per update. Tried 4 and 32.
         mini_batch_size = 4
         # How about the batch size used during learning? It's equal to number of steps of the environment in this
         # case (num_steps).
@@ -284,7 +284,7 @@ class AgentPPO(Agent):
         ppo_epochs = 4
         # threshold_reward = -200
         # Reward threshold for auto-stop.
-        threshold_reward = 40
+        threshReward = 40
 
         self.model = PPODiscrete().float().to(device)
         self.optimizer = optim.Adam(params=self.model.parameters(), lr=self.lr)
@@ -293,8 +293,6 @@ class AgentPPO(Agent):
         max_frames = 20000
         frame_idx = 0
         test_rewards = []
-        testReward = 0.
-        testRewardMean = 0.
         allRewards = []
         iterSteps = []
 
@@ -359,15 +357,13 @@ class AgentPPO(Agent):
                 if frame_idx % 30 == 29:
                     # Modified the following line.
                     # test_reward = np.mean([self.testEnv(envs) for _ in range(30)])
-                    for _ in range(30):
-                        testReward = self.testEnv(envs)
-                        testRewardMean = np.mean([testReward])
-
+                    testReward = [self.testEnv(envs) for _ in range(30)]
+                    testRewardMean = np.mean([testReward])
                     # if episode % 10 == 9:  # Print every 10th episode
                     print('[%d] Mean Reward (last 30 frames): %3.3f' % (frame_idx + 1, testRewardMean))
                     # print(test_reward)
                     test_rewards.append(testReward)
-                    if testRewardMean > threshold_reward:
+                    if testRewardMean > threshReward:
                         print(testReward)
                         early_stop = True
 
@@ -396,6 +392,7 @@ class AgentPPO(Agent):
             # actions = torch.cat(actions)
             actions = torch.tensor(actions)
 
+            # Calculate advantages.
             advantage = returns - values
 
             # Any need to standardize the advantage? Some implementations do that.
@@ -412,9 +409,9 @@ class AgentPPO(Agent):
         torch.save(self.model.state_dict(), './Breakout_PPODiscrete' + '_Model_' + str(np.max(iterSteps) + 1) +
                    '.pth')
 
-        # Save both networks/models.
-        torch.save(self.model.state_dict(), './Breakout_PPODiscrete' + '_Model_' + str(np.max(iterSteps) + 1) +
-                   '.pth')
+        # # Save both networks/models.
+        # torch.save(self.model.state_dict(), './Breakout_PPODiscrete' + '_Model_' + str(np.max(iterSteps) + 1) +
+        #            '.pth')
 
         # # Dump the output into a binary file to be plotted later using pickle.
         # outFile = [episodeList, iterSteps, scores]

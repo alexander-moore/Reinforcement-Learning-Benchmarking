@@ -138,7 +138,7 @@ class AgentPPO(Agent):
         #         observation = (np.float32(observation) / 255.0).transpose((2, 0, 1))
         #         observation = torch.from_numpy(observation).unsqueeze(0)
         #         action = self.Q(observation.to(self.dev)).argmax(dim=1).item()
-        
+        #
         ###########################
         # return action
         pass
@@ -193,6 +193,7 @@ class AgentPPO(Agent):
                 dist, _ = self.model(state.to(self.dev))
 
                 # Instead of just sampling from the distribution, use argmax() during test.
+                # Can't do that in continuous actions.
                 # print(dist.sample().numpy().squeeze())
                 # print(dist.probs.detach().numpy())
                 # print(dist.probs.detach().cpu().numpy().argmax().item())
@@ -212,8 +213,7 @@ class AgentPPO(Agent):
         values = values + [nextValue]
         gae = 0
         returns = []
-        # print(nextValue)
-        # print(len(rewards))
+
         for step in reversed(range(len(rewards))):
             delta = rewards[step] + gamma * values[step + 1] * masks[step] - values[step]
             # print(delta)
@@ -265,10 +265,8 @@ class AgentPPO(Agent):
                 # optimizer.zero_grad()
                 self.optimizer.zero_grad()
                 loss.backward()
-                # Try clipping the gradient. Got an error due to vanishing and or exploding gradient Prob < 0. It
-                # doesn't work to solve that issue. Furthermore, it tends to cause test rewards/scores to plateau at
-                # 0.4.
-                # nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=100.0)
+                # Try clipping the gradient. Got an error due to vanishing and or exploding gradient Prob < 0.
+                # nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=1.0)
                 # optimizer.step()
                 self.optimizer.step()
 
@@ -283,35 +281,28 @@ class AgentPPO(Agent):
         device = self.dev
 
         # Hyper-parameters (will add to super)
-        # hidden_size = 256
         # Learning rate.
         lr = self.lr
         # Max number of steps to take for each episode. Or is it # of steps of the environment per update? 1024
-        num_steps = 250     # was 128, 500 in several cases
+        num_steps = 128     # was 128, 500 in several cases
         # Number of training mini-batches per update. Typically 4.
-        mini_batch_size = 5     # was 4, 5 in one case
+        mini_batch_size = 4     # was 4, 5 in one case
         # How about the batch size used during learning? It's equal to number of steps of the environment in this
         # case (num_steps).
         # Number of training epochs per update.
-        ppo_epochs = 4     # was 4 10 in one case
+        ppo_epochs = 4     # was 4. 10 in one case
         # Reward threshold for auto-stop.
-        threshold_reward = 90
+        threshReward = 90
 
-        # Comment out original model name (ActorCritic) and remove input parameters.
-        # model = ActorCritic(num_inputs, num_outputs, hidden_size).to(device)
         self.model = PPO().float().to(device)
-        # optimizer = optim.Adam(model.parameters(), lr=lr)
         self.optimizer = optim.Adam(params=self.model.parameters(), lr=self.lr)
 
         # Maximum number of frames to run (total # of actions to take in the environment).
         max_frames = 10000
         frame_idx = 0
         test_rewards = []
-        testReward = 0.
-        testRewardMean = 0.
         allRewards = []
         iterSteps = []
-        # allEntropy = []
 
         # state will be an array of size 2 (1x2) with the first being the position and second
         # being the velocity.
@@ -334,6 +325,7 @@ class AgentPPO(Agent):
             masks = []
             entropy = 0
 
+            # Not implemented for continuous case.
             # # Try learning rate annealing.
             # lr = lr - ((frame_idx / num_steps) / self.lrStep)
             # if lr < self.lrMin:
@@ -394,19 +386,17 @@ class AgentPPO(Agent):
                 frame_idx += 1
 
                 if frame_idx % 30 == 29:
-                    # Modified the following line.
-                    for _ in range(30):
-                        testReward = self.testEnv(envs)
-                        testRewardMean = np.mean([testReward])
-
+                    testReward = [self.testEnv(envs) for _ in range(30)]
+                    testRewardMean = np.mean(testReward)
                     # test_reward = np.mean([self.testEnv(envs) for _ in range(30)])
                     # if episode % 10 == 9:  # Print every 10th episode
                     # print('[%d] Mean Reward (last 30 frames): %3.3f' % (frame_idx + 1, test_reward))
                     print('[%d] Mean Reward (last 30 frames): %3.3f' % (frame_idx + 1, testRewardMean))
                     # print(test_reward)
-                    test_rewards.append([testReward])
+                    test_rewards.append(testReward)
+                    # print(test_rewards)
                     # plot(frame_idx, test_rewards)
-                    if testRewardMean > threshold_reward:
+                    if testRewardMean > threshReward:
                         # Added the following line:
                         print(testRewardMean)
                         early_stop = True
@@ -440,14 +430,14 @@ class AgentPPO(Agent):
             # print(actions.size())
             advantage = returns - values
             # print(advantage.size())
-            # Any need to standardize the advantage? Some implementations do that.
+            # Any need to standardize the advantage? Some implementations do that. When not standardizing the
+            # advantage, the result is high negative scores. However, no need to clip gradient norm though.
             advantage = (advantage - advantage.mean()) / advantage.std()
 
             self.ppoUpdate(ppo_epochs, mini_batch_size, states, actions, log_probs, returns, advantage)
 
         outFile = np.array([iterSteps, self.allLosses, self.allEntropy, test_rewards]).transpose()
-        # print(np.max(iterSteps))
-        # print(len(self.allLosses))
+
         with open('MountainCarContinuous_PPO_Results_pkl_' + str(np.max(iterSteps)+1) + '.data',
                   'wb') as fid:
             pickle.dump(outFile, fid)
